@@ -1,9 +1,11 @@
+import { computeHello } from "./computeHello";
+
 export function sayHello(element: HTMLButtonElement) {
-  let isWaving = false;
+  let shouldWave = false;
   const setWave = (wave: boolean) => {
-    isWaving = wave;
-    element.innerHTML = `${isWaving ? "👋" : "Hello you!"}`;
+    shouldWave = wave;
+    element.innerHTML = computeHello(shouldWave);
   };
-  element.addEventListener("click", () => setWave(!isWaving));
+  element.addEventListener("click", () => setWave(!shouldWave));
   setWave(false);
 }
