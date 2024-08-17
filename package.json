@@ -6,12 +6,22 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "format": "npx prettier --check ./src",
+    "lint": "npx eslint ./src",
+    "test": "vitest",
+    "test:nowatch": "vitest run",
+    "ci": "npm run format && npm run lint && npm run test:nowatch && npm run build"
   },
   "devDependencies": {
+    "@eslint/js": "^9.9.0",
+    "eslint": "^9.9.0",
+    "globals": "^15.9.0",
     "lightningcss": "^1.26.0",
     "terser": "^5.31.6",
     "typescript": "^5.5.3",
-    "vite": "^5.4.0"
+    "typescript-eslint": "^8.1.0",
+    "vite": "^5.4.0",
+    "vitest": "^2.0.5"
   }
 }
