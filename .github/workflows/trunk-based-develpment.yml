@@ -1,0 +1,60 @@
+name: Trunk-Based Development
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  ci:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Use Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: 'lts/*'
+
+    - name: Install dependencies
+      run: npm ci
+
+    - name: Run CI script
+      run: npm run ci
+
+    - name: Upload dist folder
+      uses: actions/upload-artifact@v4
+      with:
+        name: dist
+        path: dist
+
+  cd:
+    needs: ci
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Download dist folder
+      uses: actions/download-artifact@v4
+      with:
+        name: dist
+        path: dist
+
+    - name: Zip dist folder
+      run: zip -r dist.zip dist
+
+    - name: Check zip size
+      run: |
+        size=$(du -k dist.zip | cut -f1)
+        echo "Archive size: $size KB"
+        if [ $size -gt 13 ]; then
+          echo "Archive size exceeds 13KB limit"
+          exit 1
+        fi
+
+    - name: Upload artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: dist-archive
+        path: dist.zip
