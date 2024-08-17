@@ -8,6 +8,7 @@
     "build": "tsc && vite build",
     "preview": "vite preview",
     "format": "npx prettier --check ./src",
+    "format:fix": "npx prettier --write ./src",
     "lint": "npx eslint ./src",
     "test": "vitest",
     "test:nowatch": "vitest run",

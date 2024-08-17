@@ -1,19 +1,43 @@
 import "./style.css";
-import { sayHello } from "./hello.ts";
+
+import { GameState, State } from "./global.ts";
+
+import { render } from "./render.ts";
+import { gameHandler } from "./game.ts";
+
+declare global {
+  interface Window {
+    _: {
+      game: GameState;
+    };
+  }
+}
+
+window._ = {
+  game: {
+    state: State.welcome,
+  },
+};
+
+const game: GameState = window._.game;
 
 document.querySelector<HTMLDivElement>("#app")!.innerHTML = `
   <div>
-    <a href="https://maeevick.substack.com/s/microgame-maker-en-edition" target="_blank">
+    <a class="home" href="https://maeevick.substack.com/s/microgame-maker-en-edition" target="_blank">
       <img src="" class="logo" alt="Follow my MicroGame Maker journey" />
     </a>
-    <h1>JS13K - 2024</h1>
-    <div class="card">
+    <h1 class="home">JS13K - 2024</h1>
+    <h2 class="">🎮 Work in Progress - Codename ???</h2>
+    <div class="card home">
       <button id="hello" type="button"></button>
     </div>
-    <a href="https://js13kgames.com/" target="_blank">
+    <div id="game" class="hidden">
+      <canvas id="canvas"></canvas>
+    </div>
+    <a class="link home" href="https://js13kgames.com/" target="_blank">
       <img src="" class="logo" alt="What's JS13K" />
     </a>
   </div>
 `;
 
-sayHello(document.querySelector<HTMLButtonElement>("#hello")!);
+render(game, document.querySelector<HTMLButtonElement>("#hello")!, gameHandler);
