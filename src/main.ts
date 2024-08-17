@@ -1,9 +1,7 @@
 import "./style.css";
 
 import { GameState, State } from "./global.ts";
-
-import { render } from "./render.ts";
-import { gameHandler } from "./game.ts";
+import { render } from "./interface.ts";
 
 declare global {
   interface Window {
@@ -32,7 +30,7 @@ document.querySelector<HTMLDivElement>("#app")!.innerHTML = `
       <button id="hello" type="button"></button>
     </div>
     <div id="game" class="hidden">
-      <canvas id="canvas"></canvas>
+      <canvas id="canvas" width="320" height="320"></canvas>
     </div>
     <a class="link home" href="https://js13kgames.com/" target="_blank">
       <img src="" class="logo" alt="What's JS13K" />
@@ -40,4 +38,4 @@ document.querySelector<HTMLDivElement>("#app")!.innerHTML = `
   </div>
 `;
 
-render(game, document.querySelector<HTMLButtonElement>("#hello")!, gameHandler);
+render(game, document.querySelector<HTMLButtonElement>("#hello")!);
