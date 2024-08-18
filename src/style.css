@@ -1,5 +1,3 @@
-@import url("game.css");
-
 :root {
   font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;
@@ -47,11 +45,8 @@ h1 {
   text-align: center;
 }
 
-.card {
-  padding: 2em;
-}
-
 button {
+  margin: 2em;
   border-radius: 8px;
   border: 1px solid transparent;
   padding: 0.6em 1.2em;
@@ -68,6 +63,21 @@ button:hover {
 button:focus,
 button:focus-visible {
   outline: 4px auto -webkit-focus-ring-color;
+}
+
+#canvas {
+  margin: 0 auto;
+  width: min(80vh, 80vw);
+  height: min(80vh, 80vw);
+  background-color: whitesmoke;
+}
+
+.block {
+  display: block;
+}
+
+.hidden {
+  display: none;
 }
 
 @media (prefers-color-scheme: light) {
