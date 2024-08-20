@@ -7,6 +7,7 @@ test(`when the game is updated and Game Over,
         state is not changed`, () => {
   const initialGameState = {
     canvas: { width: 100, height: 100 },
+    joystick: { x: 80, y: 80, radius: 10 },
     gameOver: true,
     player: {
       x: 0,
@@ -14,11 +15,11 @@ test(`when the game is updated and Game Over,
       radius: 5,
     },
     enemies: [{ x: 100, y: 100 }],
-    keys: {
-      ArrowUp: false,
-      ArrowDown: false,
-      ArrowLeft: false,
-      ArrowRight: false,
+    directions: {
+      up: false,
+      down: false,
+      left: false,
+      right: false,
     },
   };
   expect(updateGameState(initialGameState, 0)).toStrictEqual(initialGameState);
@@ -29,6 +30,7 @@ test(`when the player collides with an ennemy,
         Game is Over`, () => {
   const initialGameState = {
     canvas: { width: 100, height: 100 },
+    joystick: { x: 80, y: 80, radius: 10 },
     gameOver: false,
     player: {
       x: 90,
@@ -36,15 +38,16 @@ test(`when the player collides with an ennemy,
       radius: 5,
     },
     enemies: [{ x: 100, y: 100 }],
-    keys: {
-      ArrowUp: false,
-      ArrowDown: true,
-      ArrowLeft: false,
-      ArrowRight: true,
+    directions: {
+      up: false,
+      down: true,
+      left: false,
+      right: true,
     },
   };
   const expectedGameState = {
     canvas: { width: 100, height: 100 },
+    joystick: { x: 80, y: 80, radius: 10 },
     gameOver: true,
     player: {
       x: 95,
@@ -52,11 +55,11 @@ test(`when the player collides with an ennemy,
       radius: 5,
     },
     enemies: [{ x: 100, y: 100 }],
-    keys: {
-      ArrowUp: false,
-      ArrowDown: true,
-      ArrowLeft: false,
-      ArrowRight: true,
+    directions: {
+      up: false,
+      down: true,
+      left: false,
+      right: true,
     },
   };
   expect(updateGameState(initialGameState, 100)).toStrictEqual(
@@ -69,6 +72,7 @@ test(`when the player moves left for one frame,
         player x position is dcreased by the player move speed (120)`, () => {
   const initialGameState = {
     canvas: { width: 1000, height: 1000 },
+    joystick: { x: 80, y: 80, radius: 10 },
     gameOver: false,
     player: {
       x: 500,
@@ -76,16 +80,17 @@ test(`when the player moves left for one frame,
       radius: 5,
     },
     enemies: [{ x: 1000, y: 1000 }],
-    keys: {
-      ArrowUp: false,
-      ArrowDown: false,
-      ArrowLeft: true,
-      ArrowRight: false,
+    directions: {
+      up: false,
+      down: false,
+      left: true,
+      right: false,
     },
   };
 
   const expectedGameState = {
     canvas: { width: 1000, height: 1000 },
+    joystick: { x: 80, y: 80, radius: 10 },
     gameOver: false,
     player: {
       x: 380,
@@ -93,11 +98,11 @@ test(`when the player moves left for one frame,
       radius: 5,
     },
     enemies: [{ x: 1000, y: 1000 }],
-    keys: {
-      ArrowUp: false,
-      ArrowDown: false,
-      ArrowLeft: true,
-      ArrowRight: false,
+    directions: {
+      up: false,
+      down: false,
+      left: true,
+      right: false,
     },
   };
 
@@ -111,6 +116,7 @@ test(`when the player moves right for one frame,
         player x position is increased by the player move speed (120)`, () => {
   const initialGameState = {
     canvas: { width: 1000, height: 1000 },
+    joystick: { x: 80, y: 80, radius: 10 },
     gameOver: false,
     player: {
       x: 500,
@@ -118,16 +124,17 @@ test(`when the player moves right for one frame,
       radius: 5,
     },
     enemies: [{ x: 1000, y: 1000 }],
-    keys: {
-      ArrowUp: false,
-      ArrowDown: false,
-      ArrowLeft: false,
-      ArrowRight: true,
+    directions: {
+      up: false,
+      down: false,
+      left: false,
+      right: true,
     },
   };
 
   const expectedGameState = {
     canvas: { width: 1000, height: 1000 },
+    joystick: { x: 80, y: 80, radius: 10 },
     gameOver: false,
     player: {
       x: 620,
@@ -135,11 +142,11 @@ test(`when the player moves right for one frame,
       radius: 5,
     },
     enemies: [{ x: 1000, y: 1000 }],
-    keys: {
-      ArrowUp: false,
-      ArrowDown: false,
-      ArrowLeft: false,
-      ArrowRight: true,
+    directions: {
+      up: false,
+      down: false,
+      left: false,
+      right: true,
     },
   };
 
@@ -153,6 +160,7 @@ test(`when the player moves up for one frame,
         player y position is dcreased by the player move speed (120)`, () => {
   const initialGameState = {
     canvas: { width: 1000, height: 1000 },
+    joystick: { x: 80, y: 80, radius: 10 },
     gameOver: false,
     player: {
       x: 500,
@@ -160,16 +168,17 @@ test(`when the player moves up for one frame,
       radius: 5,
     },
     enemies: [{ x: 1000, y: 1000 }],
-    keys: {
-      ArrowUp: true,
-      ArrowDown: false,
-      ArrowLeft: false,
-      ArrowRight: false,
+    directions: {
+      up: true,
+      down: false,
+      left: false,
+      right: false,
     },
   };
 
   const expectedGameState = {
     canvas: { width: 1000, height: 1000 },
+    joystick: { x: 80, y: 80, radius: 10 },
     gameOver: false,
     player: {
       x: 500,
@@ -177,11 +186,11 @@ test(`when the player moves up for one frame,
       radius: 5,
     },
     enemies: [{ x: 1000, y: 1000 }],
-    keys: {
-      ArrowUp: true,
-      ArrowDown: false,
-      ArrowLeft: false,
-      ArrowRight: false,
+    directions: {
+      up: true,
+      down: false,
+      left: false,
+      right: false,
     },
   };
 
@@ -195,6 +204,7 @@ test(`when the player moves down for one frame,
         player y position is increased by the player move speed (120)`, () => {
   const initialGameState = {
     canvas: { width: 1000, height: 1000 },
+    joystick: { x: 80, y: 80, radius: 10 },
     gameOver: false,
     player: {
       x: 500,
@@ -202,16 +212,17 @@ test(`when the player moves down for one frame,
       radius: 5,
     },
     enemies: [{ x: 1000, y: 1000 }],
-    keys: {
-      ArrowUp: false,
-      ArrowDown: true,
-      ArrowLeft: false,
-      ArrowRight: false,
+    directions: {
+      up: false,
+      down: true,
+      left: false,
+      right: false,
     },
   };
 
   const expectedGameState = {
     canvas: { width: 1000, height: 1000 },
+    joystick: { x: 80, y: 80, radius: 10 },
     gameOver: false,
     player: {
       x: 500,
@@ -219,11 +230,11 @@ test(`when the player moves down for one frame,
       radius: 5,
     },
     enemies: [{ x: 1000, y: 1000 }],
-    keys: {
-      ArrowUp: false,
-      ArrowDown: true,
-      ArrowLeft: false,
-      ArrowRight: false,
+    directions: {
+      up: false,
+      down: true,
+      left: false,
+      right: false,
     },
   };
 

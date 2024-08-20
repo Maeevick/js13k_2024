@@ -32,8 +32,30 @@ const startGame = () => {
 
   let lastTime = performance.now();
 
-  const updateKeys = (key: string, isPressed: boolean) => {
-    state = { ...state, keys: { ...state.keys, [key]: isPressed } };
+  const handleArrowKeyPress = (key: string, isPressed: boolean) => {
+    const direction: Record<string, string> = {
+      ArrowUp: "up",
+      ArrowDown: "down",
+      ArrowRight: "right",
+      ArrowLeft: "left",
+    };
+
+    state = {
+      ...state,
+      directions: { ...state.directions, [direction[key]]: isPressed },
+    };
+  };
+
+  const handleTouchStart = (event: TouchEvent) => {
+    event.preventDefault();
+    state = handleTouchEvents(state)(event);
+
+    resetGame();
+  };
+
+  const handleTouchMove = (event: TouchEvent) => {
+    event.preventDefault();
+    state = handleTouchEvents(state)(event);
   };
 
   const resetGame = () => {
@@ -42,7 +64,13 @@ const startGame = () => {
     }
   };
 
-  setupEventListeners(canvas, updateKeys, resetGame);
+  setupEventListeners(
+    canvas,
+    handleArrowKeyPress,
+    resetGame,
+    handleTouchStart,
+    handleTouchMove
+  );
 
   const gameLoop = (currentTime: number) => {
     const deltaTime = currentTime - lastTime;
@@ -58,7 +86,7 @@ const startGame = () => {
 };
 
 const setupCanvas = (
-  canvasId: string,
+  canvasId: string
 ): [HTMLCanvasElement, CanvasRenderingContext2D] => {
   const canvas = document.getElementById(canvasId) as HTMLCanvasElement;
   const ctx = canvas.getContext("2d")!;
@@ -67,25 +95,19 @@ const setupCanvas = (
 
 const setupEventListeners = (
   canvas: HTMLCanvasElement,
-  updateKeys: (key: string, isPressed: boolean) => void,
+  handleArrowKeyPress: (key: string, isPressed: boolean) => void,
   resetGame: () => void,
+  handleTouchStart: (event: TouchEvent) => void,
+  handleTouchMove: (event: TouchEvent) => void
 ) => {
-  window.addEventListener("keydown", (e) => {
-    e.preventDefault();
-    if (["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight"].includes(e.key)) {
-      updateKeys(e.key, true);
-    }
-  });
+  if (isToucheDevice()) {
+    setupTouchEventListeners(canvas, handleTouchStart, handleTouchMove);
+  } else {
+    setupKeyboardEventListeners(handleArrowKeyPress);
+  }
 
-  window.addEventListener("keyup", (e) => {
-    e.preventDefault();
-    if (["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight"].includes(e.key)) {
-      updateKeys(e.key, false);
-    }
-  });
-
-  // TODO: handle click on canvas
   canvas.addEventListener("click", (e) => {
+    e.preventDefault();
     const rect = canvas.getBoundingClientRect();
     const x = e.clientX - rect.left;
     const y = e.clientY - rect.top;
@@ -96,8 +118,34 @@ const setupEventListeners = (
   });
 };
 
+const setupKeyboardEventListeners = (
+  handleArrowKeyPress: (key: string, isPressed: boolean) => void
+) => {
+  window.addEventListener("keydown", (e) => {
+    e.preventDefault();
+    if (["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight"].includes(e.key)) {
+      handleArrowKeyPress(e.key, true);
+    }
+  });
+
+  window.addEventListener("keyup", (e) => {
+    e.preventDefault();
+    if (["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight"].includes(e.key)) {
+      handleArrowKeyPress(e.key, false);
+    }
+  });
+};
+const setupTouchEventListeners = (
+  canvas: HTMLCanvasElement,
+  handleTouchStart: (event: TouchEvent) => void,
+  handleTouchMove: (event: TouchEvent) => void
+) => {
+  canvas.addEventListener("touchstart", handleTouchStart);
+  canvas.addEventListener("touchmove", handleTouchMove);
+};
+
 const render = (state: RenderState): void => {
-  const { ctx, player, enemies, canvas, gameOver } = state;
+  const { ctx, player, enemies, canvas, joystick, gameOver } = state;
 
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 
@@ -116,6 +164,114 @@ const render = (state: RenderState): void => {
     ctx.textBaseline = "middle";
     ctx.fillText("XIII", enemy.x, enemy.y);
   });
+
+  if (isToucheDevice()) {
+    ctx.beginPath();
+    ctx.moveTo(joystick.x, joystick.y);
+    ctx.lineTo(
+      joystick.x +
+        joystick.radius *
+          (state.directions.right ? 1 : state.directions.left ? -1 : 0),
+      joystick.y +
+        joystick.radius *
+          (state.directions.down ? 1 : state.directions.up ? -1 : 0)
+    );
+    ctx.strokeStyle = "black";
+    ctx.lineWidth = 2;
+    ctx.stroke();
+
+    const joystickSize = 100;
+    const innerJoystickSize = 10;
+    const joystickX = canvas.width - 20 - joystickSize / 2;
+    const joystickY = canvas.height - 20 - joystickSize / 2;
+
+    ctx.beginPath();
+    ctx.arc(joystickX, joystickY, joystickSize / 2, 0, 2 * Math.PI);
+    ctx.strokeStyle = "black";
+    ctx.lineWidth = 2;
+    ctx.stroke();
+
+    ctx.beginPath();
+    ctx.arc(joystickX, joystickY, innerJoystickSize / 2, 0, 2 * Math.PI);
+    ctx.fillStyle = "black";
+    ctx.fill();
+
+    ctx.beginPath();
+    ctx.moveTo(joystickX, joystickY - joystickSize / 2 + innerJoystickSize / 2);
+    ctx.lineTo(
+      joystickX,
+      joystickY - joystickSize / 2 + innerJoystickSize + 10
+    );
+    ctx.stroke();
+
+    ctx.beginPath();
+    ctx.moveTo(joystickX + joystickSize / 2 - innerJoystickSize / 2, joystickY);
+    ctx.lineTo(
+      joystickX + joystickSize / 2 - innerJoystickSize - 10,
+      joystickY
+    );
+    ctx.stroke();
+
+    ctx.beginPath();
+    ctx.moveTo(joystickX, joystickY + joystickSize / 2 - innerJoystickSize / 2);
+    ctx.lineTo(
+      joystickX,
+      joystickY + joystickSize / 2 - innerJoystickSize - 10
+    );
+    ctx.stroke();
+
+    ctx.beginPath();
+    ctx.moveTo(joystickX - joystickSize / 2 + innerJoystickSize / 2, joystickY);
+    ctx.lineTo(
+      joystickX - joystickSize / 2 + innerJoystickSize + 10,
+      joystickY
+    );
+    ctx.stroke();
+
+    ctx.beginPath();
+    ctx.moveTo(
+      joystickX - joystickSize / 2 + innerJoystickSize / 2,
+      joystickY - joystickSize / 2 + innerJoystickSize / 2
+    );
+    ctx.lineTo(
+      joystickX - joystickSize / 2 + innerJoystickSize + 10,
+      joystickY - joystickSize / 2 + innerJoystickSize + 10
+    );
+    ctx.stroke();
+
+    ctx.beginPath();
+    ctx.moveTo(
+      joystickX + joystickSize / 2 - innerJoystickSize / 2,
+      joystickY - joystickSize / 2 + innerJoystickSize / 2
+    );
+    ctx.lineTo(
+      joystickX + joystickSize / 2 - innerJoystickSize - 10,
+      joystickY - joystickSize / 2 + innerJoystickSize + 10
+    );
+    ctx.stroke();
+
+    ctx.beginPath();
+    ctx.moveTo(
+      joystickX - joystickSize / 2 + innerJoystickSize / 2,
+      joystickY + joystickSize / 2 - innerJoystickSize / 2
+    );
+    ctx.lineTo(
+      joystickX - joystickSize / 2 + innerJoystickSize + 10,
+      joystickY + joystickSize / 2 - innerJoystickSize - 10
+    );
+    ctx.stroke();
+
+    ctx.beginPath();
+    ctx.moveTo(
+      joystickX + joystickSize / 2 - innerJoystickSize / 2,
+      joystickY + joystickSize / 2 - innerJoystickSize / 2
+    );
+    ctx.lineTo(
+      joystickX + joystickSize / 2 - innerJoystickSize - 10,
+      joystickY + joystickSize / 2 - innerJoystickSize - 10
+    );
+    ctx.stroke();
+  }
 
   if (gameOver) {
     ctx.fillStyle = "rgba(0, 0, 0, 0.5)";
@@ -150,4 +306,49 @@ const render = (state: RenderState): void => {
   } else {
     state.homeButton = null;
   }
+};
+
+const handleTouchEvents =
+  (state: GameState) =>
+  (event: TouchEvent): GameState => {
+    const { joystick } = state;
+
+    const { clientX, clientY } = event.touches[0];
+    const rect =
+      event.currentTarget instanceof Element
+        ? event.currentTarget.getBoundingClientRect()
+        : null;
+
+    if (rect) {
+      const touchX = clientX - rect.left;
+      const touchY = clientY - rect.top;
+
+      const dx = touchX - joystick.x;
+      const dy = touchY - joystick.y;
+      const distance = Math.sqrt(dx ** 2 + dy ** 2);
+
+      if (distance <= joystick.radius) {
+        const angle = Math.atan2(dy, dx) * (180 / Math.PI);
+        const directions: { [key: string]: boolean } = {
+          right: angle > -67.5 && angle <= 67.5,
+          down: angle > 22.5 && angle <= 157.5,
+          left: angle > 112.5 || angle <= -112.5,
+          up: angle > -157.5 && angle <= -22.5,
+        };
+
+        return {
+          ...state,
+          directions,
+        };
+      }
+    }
+
+    return state;
+  };
+
+const isToucheDevice = () => {
+  return (
+    window.ontouchstart ||
+    (navigator.maxTouchPoints > 0 && navigator.maxTouchPoints <= 5)
+  );
 };

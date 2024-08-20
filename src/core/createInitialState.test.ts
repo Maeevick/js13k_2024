@@ -18,22 +18,28 @@ test(`when the game is initialized with a canvas of 100px * 100px,
     { x: 42, y: 42 },
   ];
   const expectedGameOverState = false;
-  const expectedKeysState = {
-    ArrowUp: false,
-    ArrowDown: false,
-    ArrowLeft: false,
-    ArrowRight: false,
+  const expectedDirections = {
+    up: false,
+    down: false,
+    left: false,
+    right: false,
   };
   const expectedPlayer = {
     radius: 5,
     x: 50,
     y: 50,
   };
+  const expectedJoystick = {
+    x: 30,
+    y: 30,
+    radius: 50,
+  };
   expect(createInitialState(100, 100, () => 0.42)).toStrictEqual({
     canvas: expectedCanvas,
+    joystick: expectedJoystick,
     enemies: expectedEnnemies,
     gameOver: expectedGameOverState,
-    keys: expectedKeysState,
+    directions: expectedDirections,
     player: expectedPlayer,
   });
 });

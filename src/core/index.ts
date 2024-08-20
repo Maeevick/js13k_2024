@@ -2,7 +2,12 @@ export type GameState = {
   player: { x: number; y: number; radius: number };
   enemies: Array<{ x: number; y: number }>;
   canvas: { width: number; height: number };
-  keys: { [key: string]: boolean };
+  joystick: {
+    x: number;
+    y: number;
+    radius: number;
+  };
+  directions: { [key: string]: boolean };
   gameOver: boolean;
 };
 
@@ -17,12 +22,13 @@ export const createInitialState = (
     y: random() * canvasHeight,
   })),
   canvas: { width: canvasWidth, height: canvasHeight },
-  keys: {
-    ArrowUp: false,
-    ArrowDown: false,
-    ArrowLeft: false,
-    ArrowRight: false,
+  directions: {
+    left: false,
+    right: false,
+    up: false,
+    down: false,
   },
+  joystick: createTouchZone(canvasWidth, canvasHeight),
   gameOver: false,
 });
 
@@ -41,18 +47,18 @@ const updatePlayerPosition = (
   const moveSpeed = 120;
   const moveDistance = moveSpeed * (deltaTime / 1000);
 
-  const newX = state.keys.ArrowLeft
+  const newX = state.directions.left
     ? Math.max(state.player.radius, state.player.x - moveDistance)
-    : state.keys.ArrowRight
+    : state.directions.right
       ? Math.min(
           state.canvas.width - state.player.radius,
           state.player.x + moveDistance,
         )
       : state.player.x;
 
-  const newY = state.keys.ArrowUp
+  const newY = state.directions.up
     ? Math.max(state.player.radius, state.player.y - moveDistance)
-    : state.keys.ArrowDown
+    : state.directions.down
       ? Math.min(
           state.canvas.height - state.player.radius,
           state.player.y + moveDistance,
@@ -74,4 +80,16 @@ const checkCollisions = (state: GameState): GameState => {
   });
 
   return collision ? { ...state, gameOver: true } : state;
+};
+
+const createTouchZone = (
+  canvasWidth: number,
+  canvasHeight: number,
+): GameState["joystick"] => {
+  const zoneSize = 100;
+  return {
+    x: canvasWidth - zoneSize / 2 - 20,
+    y: canvasHeight - zoneSize / 2 - 20,
+    radius: zoneSize / 2,
+  };
 };
