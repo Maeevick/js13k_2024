@@ -11,11 +11,11 @@ test(`when the game is initialized with a canvas of 100px * 100px,
         and enemies are positionned accordingly to the randomizer function`, () => {
   const expectedCanvas = { width: 100, height: 100 };
   const expectedEnnemies = [
-    { x: 42, y: 42 },
-    { x: 42, y: 42 },
-    { x: 42, y: 42 },
-    { x: 42, y: 42 },
-    { x: 42, y: 42 },
+    { x: 42, y: 42, speed: 100 },
+    { x: 42, y: 42, speed: 100 },
+    { x: 42, y: 42, speed: 100 },
+    { x: 42, y: 42, speed: 100 },
+    { x: 42, y: 42, speed: 100 },
   ];
   const expectedGameOverState = false;
   const expectedDirections = {
@@ -26,6 +26,7 @@ test(`when the game is initialized with a canvas of 100px * 100px,
   };
   const expectedPlayer = {
     radius: 5,
+    speed: 120,
     x: 50,
     y: 50,
   };

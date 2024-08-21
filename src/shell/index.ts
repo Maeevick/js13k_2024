@@ -69,7 +69,7 @@ const startGame = () => {
     handleArrowKeyPress,
     resetGame,
     handleTouchStart,
-    handleTouchMove
+    handleTouchMove,
   );
 
   const gameLoop = (currentTime: number) => {
@@ -86,7 +86,7 @@ const startGame = () => {
 };
 
 const setupCanvas = (
-  canvasId: string
+  canvasId: string,
 ): [HTMLCanvasElement, CanvasRenderingContext2D] => {
   const canvas = document.getElementById(canvasId) as HTMLCanvasElement;
   const ctx = canvas.getContext("2d")!;
@@ -98,7 +98,7 @@ const setupEventListeners = (
   handleArrowKeyPress: (key: string, isPressed: boolean) => void,
   resetGame: () => void,
   handleTouchStart: (event: TouchEvent) => void,
-  handleTouchMove: (event: TouchEvent) => void
+  handleTouchMove: (event: TouchEvent) => void,
 ) => {
   if (isToucheDevice()) {
     setupTouchEventListeners(canvas, handleTouchStart, handleTouchMove);
@@ -119,7 +119,7 @@ const setupEventListeners = (
 };
 
 const setupKeyboardEventListeners = (
-  handleArrowKeyPress: (key: string, isPressed: boolean) => void
+  handleArrowKeyPress: (key: string, isPressed: boolean) => void,
 ) => {
   window.addEventListener("keydown", (e) => {
     e.preventDefault();
@@ -138,7 +138,7 @@ const setupKeyboardEventListeners = (
 const setupTouchEventListeners = (
   canvas: HTMLCanvasElement,
   handleTouchStart: (event: TouchEvent) => void,
-  handleTouchMove: (event: TouchEvent) => void
+  handleTouchMove: (event: TouchEvent) => void,
 ) => {
   canvas.addEventListener("touchstart", handleTouchStart);
   canvas.addEventListener("touchmove", handleTouchMove);
@@ -227,7 +227,7 @@ const isToucheDevice = () => {
 
 const drawPlayer = (
   ctx: CanvasRenderingContext2D,
-  player: { x: number; y: number; radius: number }
+  player: { x: number; y: number; radius: number },
 ) => {
   ctx.beginPath();
   ctx.arc(player.x, player.y, player.radius, 0, Math.PI * 2);
@@ -237,7 +237,7 @@ const drawPlayer = (
 
 const drawEnemy = (
   ctx: CanvasRenderingContext2D,
-  enemy: { x: number; y: number }
+  enemy: { x: number; y: number },
 ) => {
   ctx.strokeStyle = "black";
   ctx.lineWidth = 1;
@@ -257,7 +257,7 @@ const drawRestartButton = (
     y: number;
     width: number;
     height: number;
-  }
+  },
 ) => {
   const { x, y, width, height } = button;
   ctx.fillStyle = "rgba(0, 0, 0, 0.5)";
@@ -283,7 +283,7 @@ const drawJoystick = (
   ctx: CanvasRenderingContext2D,
   joystick: { x: number; y: number; radius: number },
   state: RenderState,
-  canvas: { width: number; height: number }
+  canvas: { width: number; height: number },
 ) => {
   ctx.beginPath();
   ctx.moveTo(joystick.x, joystick.y);
@@ -293,7 +293,7 @@ const drawJoystick = (
         (state.directions.right ? 1 : state.directions.left ? -1 : 0),
     joystick.y +
       joystick.radius *
-        (state.directions.down ? 1 : state.directions.up ? -1 : 0)
+        (state.directions.down ? 1 : state.directions.up ? -1 : 0),
   );
   ctx.strokeStyle = "black";
   ctx.lineWidth = 2;
@@ -338,44 +338,44 @@ const drawJoystick = (
   ctx.beginPath();
   ctx.moveTo(
     joystickX - joystickSize / 2 + innerJoystickSize / 2,
-    joystickY - joystickSize / 2 + innerJoystickSize / 2
+    joystickY - joystickSize / 2 + innerJoystickSize / 2,
   );
   ctx.lineTo(
     joystickX - joystickSize / 2 + innerJoystickSize + 10,
-    joystickY - joystickSize / 2 + innerJoystickSize + 10
+    joystickY - joystickSize / 2 + innerJoystickSize + 10,
   );
   ctx.stroke();
 
   ctx.beginPath();
   ctx.moveTo(
     joystickX + joystickSize / 2 - innerJoystickSize / 2,
-    joystickY - joystickSize / 2 + innerJoystickSize / 2
+    joystickY - joystickSize / 2 + innerJoystickSize / 2,
   );
   ctx.lineTo(
     joystickX + joystickSize / 2 - innerJoystickSize - 10,
-    joystickY - joystickSize / 2 + innerJoystickSize + 10
+    joystickY - joystickSize / 2 + innerJoystickSize + 10,
   );
   ctx.stroke();
 
   ctx.beginPath();
   ctx.moveTo(
     joystickX - joystickSize / 2 + innerJoystickSize / 2,
-    joystickY + joystickSize / 2 - innerJoystickSize / 2
+    joystickY + joystickSize / 2 - innerJoystickSize / 2,
   );
   ctx.lineTo(
     joystickX - joystickSize / 2 + innerJoystickSize + 10,
-    joystickY + joystickSize / 2 - innerJoystickSize - 10
+    joystickY + joystickSize / 2 - innerJoystickSize - 10,
   );
   ctx.stroke();
 
   ctx.beginPath();
   ctx.moveTo(
     joystickX + joystickSize / 2 - innerJoystickSize / 2,
-    joystickY + joystickSize / 2 - innerJoystickSize / 2
+    joystickY + joystickSize / 2 - innerJoystickSize / 2,
   );
   ctx.lineTo(
     joystickX + joystickSize / 2 - innerJoystickSize - 10,
-    joystickY + joystickSize / 2 - innerJoystickSize - 10
+    joystickY + joystickSize / 2 - innerJoystickSize - 10,
   );
   ctx.stroke();
 };

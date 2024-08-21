@@ -1,6 +1,6 @@
 export type GameState = {
-  player: { x: number; y: number; radius: number };
-  enemies: Array<{ x: number; y: number }>;
+  player: { x: number; y: number; radius: number; speed: number };
+  enemies: Array<{ x: number; y: number; speed: number }>;
   canvas: { width: number; height: number };
   joystick: {
     x: number;
@@ -16,10 +16,11 @@ export const createInitialState = (
   canvasHeight: number,
   random: () => number,
 ): GameState => ({
-  player: { x: canvasWidth / 2, y: canvasHeight / 2, radius: 5 },
+  player: { x: canvasWidth / 2, y: canvasHeight / 2, radius: 5, speed: 120 },
   enemies: Array.from({ length: 5 }, () => ({
     x: random() * canvasWidth,
     y: random() * canvasHeight,
+    speed: 100,
   })),
   canvas: { width: canvasWidth, height: canvasHeight },
   directions: {
@@ -37,46 +38,74 @@ export const updateGameState = (
   deltaTime: number,
 ): GameState => {
   if (state.gameOver) return state;
-  return checkCollisions(updatePlayerPosition(state, deltaTime));
+  return checkCollisions(
+    updatePlayerPosition(updateEnemyPositions(state, deltaTime), deltaTime),
+  );
 };
 
 const updatePlayerPosition = (
   state: GameState,
   deltaTime: number,
 ): GameState => {
-  const moveSpeed = 120;
-  const moveDistance = moveSpeed * (deltaTime / 1000);
+  const { player, directions, canvas } = state;
 
-  const newX = state.directions.left
-    ? Math.max(state.player.radius, state.player.x - moveDistance)
-    : state.directions.right
-      ? Math.min(
-          state.canvas.width - state.player.radius,
-          state.player.x + moveDistance,
-        )
-      : state.player.x;
+  const moveDistance = player.speed * (deltaTime / 1000);
 
-  const newY = state.directions.up
-    ? Math.max(state.player.radius, state.player.y - moveDistance)
-    : state.directions.down
-      ? Math.min(
-          state.canvas.height - state.player.radius,
-          state.player.y + moveDistance,
-        )
-      : state.player.y;
+  const newX = directions.left
+    ? Math.max(player.radius, player.x - moveDistance)
+    : directions.right
+      ? Math.min(canvas.width - player.radius, player.x + moveDistance)
+      : player.x;
+
+  const newY = directions.up
+    ? Math.max(player.radius, player.y - moveDistance)
+    : directions.down
+      ? Math.min(canvas.height - player.radius, player.y + moveDistance)
+      : player.y;
 
   return {
     ...state,
-    player: { ...state.player, x: newX, y: newY },
+    player: { ...player, x: newX, y: newY },
+  };
+};
+
+const updateEnemyPositions = (
+  state: GameState,
+  deltaTime: number,
+): GameState => {
+  const { player, enemies, canvas } = state;
+
+  const newEnemies = enemies.map((enemy) => {
+    const dx = player.x - enemy.x;
+    const dy = player.y - enemy.y;
+    const distance = Math.sqrt(dx * dx + dy * dy);
+    const moveDistance = (enemy.speed * (deltaTime / 1000)) / distance;
+
+    const newX = enemy.x + dx * moveDistance;
+    const newY = enemy.y + dy * moveDistance;
+
+    return {
+      x: Math.max(0, Math.min(canvas.width, newX)),
+      y: Math.max(0, Math.min(canvas.height, newY)),
+      speed: enemy.speed,
+    };
+  });
+
+  return {
+    ...state,
+    enemies: newEnemies,
   };
 };
 
 const checkCollisions = (state: GameState): GameState => {
-  const collision = state.enemies.some((enemy) => {
-    const dx = state.player.x - enemy.x;
-    const dy = state.player.y - enemy.y;
+  const { player, enemies } = state;
+
+  const collision = enemies.some((enemy) => {
+    const dx = player.x - enemy.x;
+    const dy = player.y - enemy.y;
     const distance = Math.sqrt(dx * dx + dy * dy);
-    return distance < state.player.radius + 5;
+
+    return distance < player.radius + 5;
   });
 
   return collision ? { ...state, gameOver: true } : state;
