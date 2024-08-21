@@ -6,7 +6,7 @@ import {
 
 type RenderState = GameState & {
   ctx: CanvasRenderingContext2D;
-  homeButton: { x: number; y: number; width: number; height: number } | null;
+  restartButton: { x: number; y: number; width: number; height: number } | null;
 };
 
 export const run = () => {
@@ -77,7 +77,7 @@ const startGame = () => {
     lastTime = currentTime;
 
     state = updateGameState(state, deltaTime);
-    render({ ...state, ctx, homeButton: null });
+    render({ ...state, ctx, restartButton: null });
 
     requestAnimationFrame(gameLoop);
   };
@@ -149,162 +149,34 @@ const render = (state: RenderState): void => {
 
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-  ctx.beginPath();
-  ctx.arc(player.x, player.y, player.radius, 0, Math.PI * 2);
-  ctx.fillStyle = "green";
-  ctx.fill();
+  drawPlayer(ctx, player);
 
   enemies.forEach((enemy) => {
-    ctx.strokeStyle = "black";
-    ctx.lineWidth = 1;
-    ctx.strokeRect(enemy.x - 5, enemy.y - 5, 10, 10);
-    ctx.fillStyle = "red";
-    ctx.font = "8px Arial";
-    ctx.textAlign = "center";
-    ctx.textBaseline = "middle";
-    ctx.fillText("XIII", enemy.x, enemy.y);
+    drawEnemy(ctx, enemy);
   });
 
   if (isToucheDevice()) {
-    ctx.beginPath();
-    ctx.moveTo(joystick.x, joystick.y);
-    ctx.lineTo(
-      joystick.x +
-        joystick.radius *
-          (state.directions.right ? 1 : state.directions.left ? -1 : 0),
-      joystick.y +
-        joystick.radius *
-          (state.directions.down ? 1 : state.directions.up ? -1 : 0)
-    );
-    ctx.strokeStyle = "black";
-    ctx.lineWidth = 2;
-    ctx.stroke();
-
-    const joystickSize = 100;
-    const innerJoystickSize = 10;
-    const joystickX = canvas.width - 20 - joystickSize / 2;
-    const joystickY = canvas.height - 20 - joystickSize / 2;
-
-    ctx.beginPath();
-    ctx.arc(joystickX, joystickY, joystickSize / 2, 0, 2 * Math.PI);
-    ctx.strokeStyle = "black";
-    ctx.lineWidth = 2;
-    ctx.stroke();
-
-    ctx.beginPath();
-    ctx.arc(joystickX, joystickY, innerJoystickSize / 2, 0, 2 * Math.PI);
-    ctx.fillStyle = "black";
-    ctx.fill();
-
-    ctx.beginPath();
-    ctx.moveTo(joystickX, joystickY - joystickSize / 2 + innerJoystickSize / 2);
-    ctx.lineTo(
-      joystickX,
-      joystickY - joystickSize / 2 + innerJoystickSize + 10
-    );
-    ctx.stroke();
-
-    ctx.beginPath();
-    ctx.moveTo(joystickX + joystickSize / 2 - innerJoystickSize / 2, joystickY);
-    ctx.lineTo(
-      joystickX + joystickSize / 2 - innerJoystickSize - 10,
-      joystickY
-    );
-    ctx.stroke();
-
-    ctx.beginPath();
-    ctx.moveTo(joystickX, joystickY + joystickSize / 2 - innerJoystickSize / 2);
-    ctx.lineTo(
-      joystickX,
-      joystickY + joystickSize / 2 - innerJoystickSize - 10
-    );
-    ctx.stroke();
-
-    ctx.beginPath();
-    ctx.moveTo(joystickX - joystickSize / 2 + innerJoystickSize / 2, joystickY);
-    ctx.lineTo(
-      joystickX - joystickSize / 2 + innerJoystickSize + 10,
-      joystickY
-    );
-    ctx.stroke();
-
-    ctx.beginPath();
-    ctx.moveTo(
-      joystickX - joystickSize / 2 + innerJoystickSize / 2,
-      joystickY - joystickSize / 2 + innerJoystickSize / 2
-    );
-    ctx.lineTo(
-      joystickX - joystickSize / 2 + innerJoystickSize + 10,
-      joystickY - joystickSize / 2 + innerJoystickSize + 10
-    );
-    ctx.stroke();
-
-    ctx.beginPath();
-    ctx.moveTo(
-      joystickX + joystickSize / 2 - innerJoystickSize / 2,
-      joystickY - joystickSize / 2 + innerJoystickSize / 2
-    );
-    ctx.lineTo(
-      joystickX + joystickSize / 2 - innerJoystickSize - 10,
-      joystickY - joystickSize / 2 + innerJoystickSize + 10
-    );
-    ctx.stroke();
-
-    ctx.beginPath();
-    ctx.moveTo(
-      joystickX - joystickSize / 2 + innerJoystickSize / 2,
-      joystickY + joystickSize / 2 - innerJoystickSize / 2
-    );
-    ctx.lineTo(
-      joystickX - joystickSize / 2 + innerJoystickSize + 10,
-      joystickY + joystickSize / 2 - innerJoystickSize - 10
-    );
-    ctx.stroke();
-
-    ctx.beginPath();
-    ctx.moveTo(
-      joystickX + joystickSize / 2 - innerJoystickSize / 2,
-      joystickY + joystickSize / 2 - innerJoystickSize / 2
-    );
-    ctx.lineTo(
-      joystickX + joystickSize / 2 - innerJoystickSize - 10,
-      joystickY + joystickSize / 2 - innerJoystickSize - 10
-    );
-    ctx.stroke();
+    drawJoystick(ctx, joystick, state, canvas);
   }
 
   if (gameOver) {
-    ctx.fillStyle = "rgba(0, 0, 0, 0.5)";
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-    ctx.fillStyle = "white";
-    ctx.font = "48px Arial";
-    ctx.textAlign = "center";
-    ctx.textBaseline = "middle";
-    ctx.fillText("GAME OVER", canvas.width / 2, canvas.height / 2);
-
     const buttonWidth = 100;
     const buttonHeight = 40;
     const buttonX = canvas.width / 2 - buttonWidth / 2;
     const buttonY = canvas.height / 2 + 50;
 
-    ctx.fillStyle = "white";
-    ctx.fillRect(buttonX, buttonY, buttonWidth, buttonHeight);
-    ctx.strokeStyle = "black";
-    ctx.strokeRect(buttonX, buttonY, buttonWidth, buttonHeight);
-
-    ctx.fillStyle = "black";
-    ctx.font = "20px Arial";
-    ctx.fillText("RESTART", canvas.width / 2, buttonY + buttonHeight / 2);
-
-    state.homeButton = {
+    const restartButton = {
       x: buttonX,
       y: buttonY,
       width: buttonWidth,
       height: buttonHeight,
     };
+
+    drawRestartButton(ctx, canvas, restartButton);
+
+    state.restartButton = restartButton;
   } else {
-    state.homeButton = null;
+    state.restartButton = null;
   }
 };
 
@@ -351,4 +223,159 @@ const isToucheDevice = () => {
     window.ontouchstart ||
     (navigator.maxTouchPoints > 0 && navigator.maxTouchPoints <= 5)
   );
+};
+
+const drawPlayer = (
+  ctx: CanvasRenderingContext2D,
+  player: { x: number; y: number; radius: number }
+) => {
+  ctx.beginPath();
+  ctx.arc(player.x, player.y, player.radius, 0, Math.PI * 2);
+  ctx.fillStyle = "green";
+  ctx.fill();
+};
+
+const drawEnemy = (
+  ctx: CanvasRenderingContext2D,
+  enemy: { x: number; y: number }
+) => {
+  ctx.strokeStyle = "black";
+  ctx.lineWidth = 1;
+  ctx.strokeRect(enemy.x - 5, enemy.y - 5, 10, 10);
+  ctx.fillStyle = "red";
+  ctx.font = "8px Arial";
+  ctx.textAlign = "center";
+  ctx.textBaseline = "middle";
+  ctx.fillText("XIII", enemy.x, enemy.y);
+};
+
+const drawRestartButton = (
+  ctx: CanvasRenderingContext2D,
+  canvas: { width: number; height: number },
+  button: {
+    x: number;
+    y: number;
+    width: number;
+    height: number;
+  }
+) => {
+  const { x, y, width, height } = button;
+  ctx.fillStyle = "rgba(0, 0, 0, 0.5)";
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+  ctx.fillStyle = "white";
+  ctx.font = "48px Arial";
+  ctx.textAlign = "center";
+  ctx.textBaseline = "middle";
+  ctx.fillText("GAME OVER", canvas.width / 2, canvas.height / 2);
+
+  ctx.fillStyle = "white";
+  ctx.fillRect(x, y, width, height);
+  ctx.strokeStyle = "black";
+  ctx.strokeRect(x, y, width, height);
+
+  ctx.fillStyle = "black";
+  ctx.font = "20px Arial";
+  ctx.fillText("RESTART", canvas.width / 2, y + height / 2);
+};
+
+const drawJoystick = (
+  ctx: CanvasRenderingContext2D,
+  joystick: { x: number; y: number; radius: number },
+  state: RenderState,
+  canvas: { width: number; height: number }
+) => {
+  ctx.beginPath();
+  ctx.moveTo(joystick.x, joystick.y);
+  ctx.lineTo(
+    joystick.x +
+      joystick.radius *
+        (state.directions.right ? 1 : state.directions.left ? -1 : 0),
+    joystick.y +
+      joystick.radius *
+        (state.directions.down ? 1 : state.directions.up ? -1 : 0)
+  );
+  ctx.strokeStyle = "black";
+  ctx.lineWidth = 2;
+  ctx.stroke();
+
+  const joystickSize = 100;
+  const innerJoystickSize = 10;
+  const joystickX = canvas.width - 20 - joystickSize / 2;
+  const joystickY = canvas.height - 20 - joystickSize / 2;
+
+  ctx.beginPath();
+  ctx.arc(joystickX, joystickY, joystickSize / 2, 0, 2 * Math.PI);
+  ctx.strokeStyle = "black";
+  ctx.lineWidth = 2;
+  ctx.stroke();
+
+  ctx.beginPath();
+  ctx.arc(joystickX, joystickY, innerJoystickSize / 2, 0, 2 * Math.PI);
+  ctx.fillStyle = "black";
+  ctx.fill();
+
+  ctx.beginPath();
+  ctx.moveTo(joystickX, joystickY - joystickSize / 2 + innerJoystickSize / 2);
+  ctx.lineTo(joystickX, joystickY - joystickSize / 2 + innerJoystickSize + 10);
+  ctx.stroke();
+
+  ctx.beginPath();
+  ctx.moveTo(joystickX + joystickSize / 2 - innerJoystickSize / 2, joystickY);
+  ctx.lineTo(joystickX + joystickSize / 2 - innerJoystickSize - 10, joystickY);
+  ctx.stroke();
+
+  ctx.beginPath();
+  ctx.moveTo(joystickX, joystickY + joystickSize / 2 - innerJoystickSize / 2);
+  ctx.lineTo(joystickX, joystickY + joystickSize / 2 - innerJoystickSize - 10);
+  ctx.stroke();
+
+  ctx.beginPath();
+  ctx.moveTo(joystickX - joystickSize / 2 + innerJoystickSize / 2, joystickY);
+  ctx.lineTo(joystickX - joystickSize / 2 + innerJoystickSize + 10, joystickY);
+  ctx.stroke();
+
+  ctx.beginPath();
+  ctx.moveTo(
+    joystickX - joystickSize / 2 + innerJoystickSize / 2,
+    joystickY - joystickSize / 2 + innerJoystickSize / 2
+  );
+  ctx.lineTo(
+    joystickX - joystickSize / 2 + innerJoystickSize + 10,
+    joystickY - joystickSize / 2 + innerJoystickSize + 10
+  );
+  ctx.stroke();
+
+  ctx.beginPath();
+  ctx.moveTo(
+    joystickX + joystickSize / 2 - innerJoystickSize / 2,
+    joystickY - joystickSize / 2 + innerJoystickSize / 2
+  );
+  ctx.lineTo(
+    joystickX + joystickSize / 2 - innerJoystickSize - 10,
+    joystickY - joystickSize / 2 + innerJoystickSize + 10
+  );
+  ctx.stroke();
+
+  ctx.beginPath();
+  ctx.moveTo(
+    joystickX - joystickSize / 2 + innerJoystickSize / 2,
+    joystickY + joystickSize / 2 - innerJoystickSize / 2
+  );
+  ctx.lineTo(
+    joystickX - joystickSize / 2 + innerJoystickSize + 10,
+    joystickY + joystickSize / 2 - innerJoystickSize - 10
+  );
+  ctx.stroke();
+
+  ctx.beginPath();
+  ctx.moveTo(
+    joystickX + joystickSize / 2 - innerJoystickSize / 2,
+    joystickY + joystickSize / 2 - innerJoystickSize / 2
+  );
+  ctx.lineTo(
+    joystickX + joystickSize / 2 - innerJoystickSize - 10,
+    joystickY + joystickSize / 2 - innerJoystickSize - 10
+  );
+  ctx.stroke();
 };
