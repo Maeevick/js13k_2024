@@ -58,9 +58,23 @@ const startGame = () => {
     state = handleTouchEvents(state)(event);
   };
 
+  const gameLoop = (currentTime: number) => {
+    const deltaTime = currentTime - lastTime;
+    lastTime = currentTime;
+
+    state = updateGameState(state, deltaTime);
+
+    render({ ...state, ctx, restartButton: null });
+
+    if (!state.gameOver) {
+      requestAnimationFrame(gameLoop);
+    }
+  };
+
   const resetGame = () => {
     if (state.gameOver) {
       state = createInitialState(canvas.width, canvas.height, Math.random);
+      requestAnimationFrame(gameLoop);
     }
   };
 
@@ -71,16 +85,6 @@ const startGame = () => {
     handleTouchStart,
     handleTouchMove,
   );
-
-  const gameLoop = (currentTime: number) => {
-    const deltaTime = currentTime - lastTime;
-    lastTime = currentTime;
-
-    state = updateGameState(state, deltaTime);
-    render({ ...state, ctx, restartButton: null });
-
-    requestAnimationFrame(gameLoop);
-  };
 
   requestAnimationFrame(gameLoop);
 };
@@ -237,11 +241,16 @@ const drawPlayer = (
 
 const drawEnemy = (
   ctx: CanvasRenderingContext2D,
-  enemy: { x: number; y: number },
+  enemy: { x: number; y: number; radius: number },
 ) => {
   ctx.strokeStyle = "black";
   ctx.lineWidth = 1;
-  ctx.strokeRect(enemy.x - 5, enemy.y - 5, 10, 10);
+  ctx.strokeRect(
+    enemy.x - enemy.radius,
+    enemy.y - enemy.radius,
+    enemy.radius * 2,
+    enemy.radius * 2,
+  );
   ctx.fillStyle = "red";
   ctx.font = "8px Arial";
   ctx.textAlign = "center";

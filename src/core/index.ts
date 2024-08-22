@@ -1,6 +1,12 @@
 export type GameState = {
-  player: { x: number; y: number; radius: number; speed: number };
-  enemies: Array<{ x: number; y: number; speed: number }>;
+  player: { id: string; x: number; y: number; radius: number; speed: number };
+  enemies: Array<{
+    id: string;
+    x: number;
+    y: number;
+    radius: number;
+    speed: number;
+  }>;
   canvas: { width: number; height: number };
   joystick: {
     x: number;
@@ -16,11 +22,19 @@ export const createInitialState = (
   canvasHeight: number,
   random: () => number,
 ): GameState => ({
-  player: { x: canvasWidth / 2, y: canvasHeight / 2, radius: 5, speed: 120 },
-  enemies: Array.from({ length: 5 }, () => ({
+  player: {
+    id: "Player0",
+    x: canvasWidth / 2,
+    y: canvasHeight / 2,
+    radius: 5,
+    speed: 120,
+  },
+  enemies: Array.from({ length: 5 }, (_, i) => ({
+    id: `Jason${i}`,
     x: random() * canvasWidth,
     y: random() * canvasHeight,
-    speed: 100,
+    radius: 5,
+    speed: 60,
   })),
   canvas: { width: canvasWidth, height: canvasHeight },
   directions: {
@@ -39,7 +53,10 @@ export const updateGameState = (
 ): GameState => {
   if (state.gameOver) return state;
   return checkCollisions(
-    updatePlayerPosition(updateEnemyPositions(state, deltaTime), deltaTime),
+    updatePlayerPosition(
+      checkEnemyCollisions(updateEnemyPositions(state, deltaTime)),
+      deltaTime,
+    ),
   );
 };
 
@@ -85,8 +102,10 @@ const updateEnemyPositions = (
     const newY = enemy.y + dy * moveDistance;
 
     return {
+      id: enemy.id,
       x: Math.max(0, Math.min(canvas.width, newX)),
       y: Math.max(0, Math.min(canvas.height, newY)),
+      radius: enemy.radius,
       speed: enemy.speed,
     };
   });
@@ -97,16 +116,66 @@ const updateEnemyPositions = (
   };
 };
 
+const checkEnemyCollisions = (state: GameState): GameState => {
+  const { enemies } = state;
+  const result = enemies.reduce<{
+    overlappingEnemies: Set<string>;
+    newEnemies: Set<GameState["enemies"][number]>;
+  }>(
+    (acc, enemy, i) => {
+      if (acc.overlappingEnemies.has(enemy.id)) {
+        return acc;
+      }
+
+      const overlappingEnemies = enemies.filter(
+        (e, j) => i < j && isColliding(enemy, e),
+      );
+      if (overlappingEnemies.length === 0) {
+        acc.newEnemies.add(enemy);
+        return acc;
+      }
+
+      const mergedEnemy = {
+        id: `jason${Date.now()}`, // Generate a new unique id
+        x:
+          (enemy.x + overlappingEnemies.reduce((x, e) => x + e.x, 0)) /
+          (overlappingEnemies.length + 1),
+        y:
+          (enemy.y + overlappingEnemies.reduce((y, e) => y + e.y, 0)) /
+          (overlappingEnemies.length + 1),
+        radius:
+          enemy.radius + overlappingEnemies.reduce((r, e) => r + e.radius, 0),
+        speed: enemy.speed + 10 * overlappingEnemies.length,
+      };
+      acc.newEnemies.add(mergedEnemy);
+      acc.overlappingEnemies.add(enemy.id);
+      overlappingEnemies.forEach((e) => acc.overlappingEnemies.add(e.id));
+      return acc;
+    },
+    {
+      overlappingEnemies: new Set<string>(),
+      newEnemies: new Set<GameState["enemies"][number]>(),
+    },
+  );
+
+  return { ...state, enemies: Array.from(result.newEnemies) };
+};
+
+const isColliding = (
+  a: { x: number; y: number; radius: number },
+  b: { x: number; y: number; radius: number },
+): boolean => {
+  const dx = a.x - b.x;
+  const dy = a.y - b.y;
+  const distance = Math.sqrt(dx * dx + dy * dy);
+
+  return distance < a.radius + b.radius;
+};
+
 const checkCollisions = (state: GameState): GameState => {
   const { player, enemies } = state;
 
-  const collision = enemies.some((enemy) => {
-    const dx = player.x - enemy.x;
-    const dy = player.y - enemy.y;
-    const distance = Math.sqrt(dx * dx + dy * dy);
-
-    return distance < player.radius + 5;
-  });
+  const collision = enemies.some((enemy) => isColliding(player, enemy));
 
   return collision ? { ...state, gameOver: true } : state;
 };
