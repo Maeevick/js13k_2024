@@ -1,6 +1,6 @@
 import { expect, test } from "vitest";
 
-import { updateGameState } from "./index.ts";
+import { updateGameState } from "./core.ts";
 
 test(`when the game is updated and Game Over, 
     then 

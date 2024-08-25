@@ -1,5 +1,5 @@
 import "./style.css";
 
-import { run } from "./shell/index.ts";
+import { run } from "./shell/shell.ts";
 
 run();

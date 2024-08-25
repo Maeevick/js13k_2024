@@ -21,31 +21,63 @@ export const createInitialState = (
   canvasWidth: number,
   canvasHeight: number,
   random: () => number,
-): GameState => ({
-  player: {
+): GameState => {
+  const player = {
     id: "Player0",
     x: canvasWidth / 2,
     y: canvasHeight / 2,
     radius: 5,
     speed: 120,
-  },
-  enemies: Array.from({ length: 5 }, (_, i) => ({
-    id: `Jason${i}`,
-    x: random() * canvasWidth,
-    y: random() * canvasHeight,
-    radius: 5,
-    speed: 60,
-  })),
-  canvas: { width: canvasWidth, height: canvasHeight },
-  directions: {
-    left: false,
-    right: false,
-    up: false,
-    down: false,
-  },
-  joystick: createTouchZone(canvasWidth, canvasHeight),
-  gameOver: false,
-});
+  };
+
+  const createEnemyPosition = () => {
+    let x = random() * canvasWidth;
+    let y = random() * canvasHeight;
+
+    const dx = x - player.x;
+    const dy = y - player.y;
+
+    if (Math.abs(dx) < 100) {
+      x = Math.max(
+        0,
+        Math.min(canvasWidth, player.x + Math.abs(dx) * (100 / dx)),
+      );
+    }
+
+    if (Math.abs(dy) < 100) {
+      y = Math.max(
+        0,
+        Math.min(canvasHeight, player.y + Math.abs(dy) * (100 / dy)),
+      );
+    }
+
+    return { x, y };
+  };
+
+  return {
+    player,
+    enemies: Array.from({ length: 5 }, (_, i) => {
+      const { x, y } = createEnemyPosition();
+
+      return {
+        id: `Jason${i}`,
+        x,
+        y,
+        radius: 5,
+        speed: 60,
+      };
+    }),
+    canvas: { width: canvasWidth, height: canvasHeight },
+    directions: {
+      left: false,
+      right: false,
+      up: false,
+      down: false,
+    },
+    joystick: createTouchZone(canvasWidth, canvasHeight),
+    gameOver: false,
+  };
+};
 
 export const updateGameState = (
   state: GameState,

@@ -2,7 +2,7 @@ import {
   createInitialState,
   updateGameState,
   type GameState,
-} from "../core/index.ts";
+} from "../core/core.ts";
 
 type RenderState = GameState & {
   ctx: CanvasRenderingContext2D;
