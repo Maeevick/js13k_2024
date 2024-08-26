@@ -1,3 +1,15 @@
+export type Surprise = {
+  id: number;
+  name: string;
+};
+
+export type SpecialArea = {
+  x: number;
+  y: number;
+  radius: number;
+  type: "hole" | "slippery" | "sticky";
+};
+
 export type GameState = {
   player: { id: string; x: number; y: number; radius: number; speed: number };
   enemies: Array<{
@@ -7,6 +19,7 @@ export type GameState = {
     radius: number;
     speed: number;
   }>;
+  specialAreas: SpecialArea[];
   canvas: { width: number; height: number };
   joystick: {
     x: number;
@@ -14,13 +27,32 @@ export type GameState = {
     radius: number;
   };
   directions: { [key: string]: boolean };
+  controlsReversed: boolean;
   gameOver: boolean;
   event: {
     ROUND_DURATION: number;
     round: number;
     timer: number;
+    surprises: Surprise[];
+    currentSurprise: Surprise | null;
   };
 };
+
+const SURPRISES: Surprise[] = [
+  { id: 1, name: "Holes Appear" },
+  { id: 2, name: "Jason Speed Up" },
+  { id: 3, name: "Player Speed Up" },
+  { id: 4, name: "Player Slow Down" },
+  { id: 5, name: "Controls Reversed" },
+  { id: 6, name: "Slippery Floor" },
+  { id: 7, name: "Sticky Floor" },
+  { id: 8, name: "Arena Shape Change" },
+  { id: 9, name: "Jasons to Edges" },
+  { id: 10, name: "Super-Jason Appears" },
+  { id: 11, name: "4 New Jasons" },
+  { id: 12, name: "Double Jasons" },
+  { id: 13, name: "Only Biggest Jason" },
+];
 
 export const createInitialState = (
   canvasWidth: number,
@@ -35,34 +67,14 @@ export const createInitialState = (
     speed: 120,
   };
 
-  const createEnemyPosition = () => {
-    let x = random() * canvasWidth;
-    let y = random() * canvasHeight;
-
-    const dx = x - player.x;
-    const dy = y - player.y;
-
-    if (Math.abs(dx) < 100) {
-      x = Math.max(
-        0,
-        Math.min(canvasWidth, player.x + Math.abs(dx) * (100 / dx)),
-      );
-    }
-
-    if (Math.abs(dy) < 100) {
-      y = Math.max(
-        0,
-        Math.min(canvasHeight, player.y + Math.abs(dy) * (100 / dy)),
-      );
-    }
-
-    return { x, y };
-  };
-
   return {
     player,
     enemies: Array.from({ length: 5 }, (_, i) => {
-      const { x, y } = createEnemyPosition();
+      const { x, y } = createSafePosition(
+        { width: canvasWidth, height: canvasHeight },
+        { x: player.x, y: player.y },
+        random,
+      );
 
       return {
         id: `Jason${i}`,
@@ -72,6 +84,7 @@ export const createInitialState = (
         speed: 60,
       };
     }),
+    specialAreas: [],
     canvas: { width: canvasWidth, height: canvasHeight },
     directions: {
       left: false,
@@ -79,12 +92,24 @@ export const createInitialState = (
       up: false,
       down: false,
     },
+    controlsReversed: false,
     joystick: createTouchZone(canvasWidth, canvasHeight),
     gameOver: false,
     event: {
       ROUND_DURATION: 13_000,
       round: 0,
       timer: 0,
+      surprises: Array.from(
+        { length: 13 },
+        () =>
+          SURPRISES[
+            Math.max(
+              0,
+              Math.min(SURPRISES.length - 1, Math.floor(random() * 13)),
+            )
+          ],
+      ),
+      currentSurprise: null,
     },
   };
 };
@@ -92,36 +117,93 @@ export const createInitialState = (
 export const updateGameState = (
   state: GameState,
   deltaTime: number,
+  random: () => number,
+  unique: () => number,
 ): GameState => {
   if (state.gameOver) return state;
 
   return checkCollisions(
     updatePlayerPosition(
       checkEnemyCollisions(
-        updateEnemyPositions(updateEvent(state, deltaTime), deltaTime),
+        updateEnemyPositions(
+          updateEvent(state, deltaTime, random, unique),
+          deltaTime,
+        ),
+        unique,
       ),
       deltaTime,
     ),
   );
 };
 
+const createSafePosition = (
+  canvas: { width: number; height: number },
+  player: { x: number; y: number },
+  random: () => number,
+) => {
+  let x = random() * canvas.width;
+  let y = random() * canvas.height;
+
+  const dx = x - player.x || 1;
+  const dy = y - player.y || 1;
+
+  if (Math.abs(dx) < 100) {
+    x = Math.max(
+      0,
+      Math.min(canvas.width, player.x + Math.abs(dx) * (100 / dx)),
+    );
+  }
+
+  if (Math.abs(dy) < 100) {
+    y = Math.max(
+      0,
+      Math.min(canvas.height, player.y + Math.abs(dy) * (100 / dy)),
+    );
+  }
+
+  return { x, y };
+};
+
 const updatePlayerPosition = (
   state: GameState,
   deltaTime: number,
 ): GameState => {
-  const { player, directions, canvas } = state;
+  const { player, directions, canvas, controlsReversed } = state;
 
-  const moveDistance = player.speed * (deltaTime / 1000);
+  let moveDistance = player.speed * (deltaTime / 1000);
 
-  const newX = directions.left
+  const affectingArea = state.specialAreas.find((area) =>
+    isColliding(state.player, area),
+  );
+
+  if (affectingArea) {
+    switch (affectingArea.type) {
+      case "hole":
+        return { ...state, gameOver: true };
+      case "slippery":
+        moveDistance *= 2;
+        break;
+      case "sticky":
+        moveDistance *= 0.2;
+        break;
+    }
+  }
+
+  const isLeft = controlsReversed ? !directions.left : directions.left;
+  const isRight = controlsReversed ? !directions.right : directions.right;
+
+  const newX = isLeft
     ? Math.max(player.radius, player.x - moveDistance)
-    : directions.right
+    : isRight
       ? Math.min(canvas.width - player.radius, player.x + moveDistance)
       : player.x;
 
-  const newY = directions.up
+  const isUp = controlsReversed ? !directions.up : directions.up;
+  const isDown = controlsReversed ? !directions.down : directions.down;
+
+  const newY = isUp
     ? Math.max(player.radius, player.y - moveDistance)
-    : directions.down
+    : isDown
       ? Math.min(canvas.height - player.radius, player.y + moveDistance)
       : player.y;
 
@@ -137,23 +219,43 @@ const updateEnemyPositions = (
 ): GameState => {
   const { player, enemies, canvas } = state;
 
-  const newEnemies = enemies.map((enemy) => {
-    const dx = player.x - enemy.x;
-    const dy = player.y - enemy.y;
-    const distance = Math.sqrt(dx * dx + dy * dy);
-    const moveDistance = (enemy.speed * (deltaTime / 1000)) / distance;
+  const newEnemies = enemies
+    .map((enemy) => {
+      const dx = player.x - enemy.x;
+      const dy = player.y - enemy.y;
+      const distance = Math.sqrt(dx * dx + dy * dy);
 
-    const newX = enemy.x + dx * moveDistance;
-    const newY = enemy.y + dy * moveDistance;
+      let moveDistance = (enemy.speed * (deltaTime / 1000)) / distance;
 
-    return {
-      id: enemy.id,
-      x: Math.max(0, Math.min(canvas.width, newX)),
-      y: Math.max(0, Math.min(canvas.height, newY)),
-      radius: enemy.radius,
-      speed: enemy.speed,
-    };
-  });
+      const affectingArea = state.specialAreas.find((area) =>
+        isColliding(enemy, area),
+      );
+
+      if (affectingArea) {
+        switch (affectingArea.type) {
+          case "hole":
+            return null;
+          case "slippery":
+            moveDistance *= 2;
+            break;
+          case "sticky":
+            moveDistance *= 0.2;
+            break;
+        }
+      }
+
+      const newX = enemy.x + dx * moveDistance;
+      const newY = enemy.y + dy * moveDistance;
+
+      return {
+        id: enemy.id,
+        x: Math.max(0, Math.min(canvas.width, newX)),
+        y: Math.max(0, Math.min(canvas.height, newY)),
+        radius: enemy.radius,
+        speed: enemy.speed,
+      };
+    })
+    .filter((enemy) => !!enemy);
 
   return {
     ...state,
@@ -161,14 +263,16 @@ const updateEnemyPositions = (
   };
 };
 
-const updateEvent = (state: GameState, deltaTime: number): GameState => {
+const updateEvent = (
+  state: GameState,
+  deltaTime: number,
+  random: () => number,
+  unique: () => number,
+): GameState => {
   const timer = state.event.timer + deltaTime;
   const round = Math.floor(timer / state.event.ROUND_DURATION);
 
-  console.log("TIMER", state.event.timer, deltaTime, timer / 1000);
-  console.log("ROUND", round);
-
-  return {
+  let updatedState = {
     ...state,
     event: {
       ...state.event,
@@ -176,6 +280,22 @@ const updateEvent = (state: GameState, deltaTime: number): GameState => {
       round,
     },
   };
+
+  if (state.event.surprises.length > 0 && round > state.event.round) {
+    updatedState = handleSurpriseAction(
+      updatedState,
+      state.event.surprises[0].id,
+      random,
+      unique,
+    );
+    updatedState.event = {
+      ...updatedState.event,
+      currentSurprise: state.event.surprises[0],
+      surprises: state.event.surprises.slice(1),
+    };
+  }
+
+  return updatedState;
 };
 
 const checkCollisions = (state: GameState): GameState => {
@@ -186,7 +306,10 @@ const checkCollisions = (state: GameState): GameState => {
   return collision ? { ...state, gameOver: true } : state;
 };
 
-const checkEnemyCollisions = (state: GameState): GameState => {
+const checkEnemyCollisions = (
+  state: GameState,
+  unique: () => number,
+): GameState => {
   const { enemies } = state;
   const result = enemies.reduce<{
     overlappingEnemies: Set<string>;
@@ -206,7 +329,7 @@ const checkEnemyCollisions = (state: GameState): GameState => {
       }
 
       const mergedEnemy = {
-        id: `jason${Date.now()}`, // Generate a new unique id
+        id: `Jason${unique()}`,
         x:
           (enemy.x + overlappingEnemies.reduce((x, e) => x + e.x, 0)) /
           (overlappingEnemies.length + 1),
@@ -231,6 +354,23 @@ const checkEnemyCollisions = (state: GameState): GameState => {
   return { ...state, enemies: Array.from(result.newEnemies) };
 };
 
+const generateSpecialAreas = (
+  count: number,
+  type: SpecialArea["type"],
+  state: GameState,
+  random: () => number,
+): SpecialArea[] => {
+  return Array.from({ length: count }, () => {
+    const { x, y } = createSafePosition(state.canvas, state.player, random);
+    return {
+      x,
+      y,
+      radius: random() * 20 + 10,
+      type,
+    };
+  });
+};
+
 const isColliding = (
   a: { x: number; y: number; radius: number },
   b: { x: number; y: number; radius: number },
@@ -240,6 +380,210 @@ const isColliding = (
   const distance = Math.sqrt(dx * dx + dy * dy);
 
   return distance < a.radius + b.radius;
+};
+
+const handleSurpriseAction = (
+  state: GameState,
+  eventId: number,
+  random: () => number,
+  unique: () => number,
+): GameState => {
+  switch (eventId) {
+    case 1:
+      return handleHolesAppear(state, random);
+    case 2:
+      return handleJasonSpeedUp(state);
+    case 3:
+      return handlePlayerSpeedUp(state);
+    case 4:
+      return handlePlayerSlowDown(state);
+    case 5:
+      return handleControlsReversed(state);
+    case 6:
+      return handleSlipperyFloor(state, random);
+    case 7:
+      return handleStickyFloor(state, random);
+    case 8:
+      return handleArenaShapeChange(state, random);
+    case 9:
+      return handleJasonsToEdges(state);
+    case 10:
+      return handleSuperJasonAppears(state, random, unique);
+    case 11:
+      return handleFourNewJasons(state, random, unique);
+    case 12:
+      return handleDoubleJasons(state, random, unique);
+    case 13:
+      return handleOnlyBiggestJason(state);
+    default:
+      return state;
+  }
+};
+
+const handleHolesAppear = (
+  state: GameState,
+  random: () => number,
+): GameState => {
+  const holes = generateSpecialAreas(3, "hole", state, random);
+  return {
+    ...state,
+    specialAreas: [...state.specialAreas, ...holes],
+  };
+};
+
+const handleSlipperyFloor = (
+  state: GameState,
+  random: () => number,
+): GameState => {
+  const slipperyAreas = generateSpecialAreas(3, "slippery", state, random);
+  return {
+    ...state,
+    specialAreas: [...state.specialAreas, ...slipperyAreas],
+  };
+};
+
+const handleStickyFloor = (
+  state: GameState,
+  random: () => number,
+): GameState => {
+  const stickyAreas = generateSpecialAreas(3, "sticky", state, random);
+  return {
+    ...state,
+    specialAreas: [...state.specialAreas, ...stickyAreas],
+  };
+};
+
+const handleControlsReversed = (state: GameState): GameState => {
+  return { ...state, controlsReversed: !state.controlsReversed };
+};
+
+const handleArenaShapeChange = (
+  state: GameState,
+  random: () => number,
+): GameState => {
+  console.log("TODO: Arena Shape Change", random());
+  return state;
+};
+
+const handleSuperJasonAppears = (
+  state: GameState,
+  random: () => number,
+  unique: () => number,
+): GameState => {
+  const { x, y } = createSafePosition(state.canvas, state.player, random);
+  const superJason = {
+    id: `Jason${unique()}`,
+    x,
+    y,
+    radius: 15,
+    speed: 90,
+  };
+  return {
+    ...state,
+    enemies: [...state.enemies, superJason],
+  };
+};
+
+const handleFourNewJasons = (
+  state: GameState,
+  random: () => number,
+  unique: () => number,
+): GameState => {
+  const newJasons = Array.from({ length: 4 }, (_, i) => {
+    const { x, y } = createSafePosition(state.canvas, state.player, random);
+    return {
+      id: `Jason${unique() + i}`,
+      x,
+      y,
+      radius: 5,
+      speed: 60,
+    };
+  });
+  return {
+    ...state,
+    enemies: [...state.enemies, ...newJasons],
+  };
+};
+
+const handleDoubleJasons = (
+  state: GameState,
+  random: () => number,
+  unique: () => number,
+): GameState => {
+  const newJasons = Array.from({ length: state.enemies.length }, (_, i) => {
+    const { x, y } = createSafePosition(state.canvas, state.player, random);
+    return {
+      id: `Jason${unique() + i}`,
+      x,
+      y,
+      radius: 5,
+      speed: 60,
+    };
+  });
+  return {
+    ...state,
+    enemies: [...state.enemies, ...newJasons],
+  };
+};
+
+const handleJasonSpeedUp = (state: GameState): GameState => {
+  return {
+    ...state,
+    enemies: state.enemies.map((enemy) => ({
+      ...enemy,
+      speed: enemy.speed + 10,
+    })),
+  };
+};
+
+const handlePlayerSpeedUp = (state: GameState): GameState => {
+  return {
+    ...state,
+    player: {
+      ...state.player,
+      speed: state.player.speed + 10,
+    },
+  };
+};
+
+const handlePlayerSlowDown = (state: GameState): GameState => {
+  return {
+    ...state,
+    player: {
+      ...state.player,
+      speed: Math.max(40, state.player.speed - 10),
+    },
+  };
+};
+
+const handleOnlyBiggestJason = (state: GameState): GameState => {
+  const biggestJason = state.enemies.reduce((prev, current) =>
+    prev.radius >= current.radius ? prev : current,
+  );
+  return {
+    ...state,
+    enemies: [biggestJason],
+  };
+};
+
+const handleJasonsToEdges = (state: GameState): GameState => {
+  const { canvas, enemies } = state;
+  return {
+    ...state,
+    enemies: enemies.map((enemy) => {
+      return {
+        ...enemy,
+        x:
+          enemy.x < canvas.width / 2
+            ? enemy.radius
+            : canvas.width - enemy.radius,
+        y:
+          enemy.y < canvas.height / 2
+            ? enemy.radius
+            : canvas.height - enemy.radius,
+      };
+    }),
+  };
 };
 
 const createTouchZone = (

@@ -1,5 +1,7 @@
 import {
   createInitialState,
+  SpecialArea,
+  Surprise,
   updateGameState,
   type GameState,
 } from "../core/core.ts";
@@ -62,7 +64,7 @@ const startGame = () => {
     const deltaTime = currentTime - lastTime;
     lastTime = currentTime;
 
-    state = updateGameState(state, deltaTime);
+    state = updateGameState(state, deltaTime, Math.random, Date.now);
 
     render({ ...state, ctx, restartButton: null });
 
@@ -149,7 +151,16 @@ const setupTouchEventListeners = (
 };
 
 const render = (state: RenderState): void => {
-  const { ctx, player, enemies, canvas, joystick, gameOver, event } = state;
+  const {
+    ctx,
+    player,
+    enemies,
+    specialAreas,
+    canvas,
+    joystick,
+    gameOver,
+    event,
+  } = state;
 
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 
@@ -157,6 +168,10 @@ const render = (state: RenderState): void => {
 
   enemies.forEach((enemy) => {
     drawEnemy(ctx, enemy);
+  });
+
+  specialAreas.forEach((area) => {
+    drawSpecialArea(ctx, area);
   });
 
   drawEventNotification(ctx, event, canvas);
@@ -258,6 +273,23 @@ const drawEnemy = (
   ctx.textAlign = "center";
   ctx.textBaseline = "middle";
   ctx.fillText("XIII", enemy.x, enemy.y);
+};
+
+const drawSpecialArea = (ctx: CanvasRenderingContext2D, area: SpecialArea) => {
+  ctx.beginPath();
+  ctx.arc(area.x, area.y, area.radius, 0, Math.PI * 2);
+  switch (area.type) {
+    case "hole":
+      ctx.fillStyle = "black";
+      break;
+    case "slippery":
+      ctx.fillStyle = "rgba(0, 255, 255, 0.3)";
+      break;
+    case "sticky":
+      ctx.fillStyle = "rgba(139, 69, 19, 0.3)";
+      break;
+  }
+  ctx.fill();
 };
 
 const drawRestartButton = (
@@ -397,6 +429,8 @@ const drawEventNotification = (
     ROUND_DURATION: number;
     round: number;
     timer: number;
+    surprises: Surprise[];
+    currentSurprise: Surprise | null;
   },
   canvas: { width: number; height: number },
 ) => {
@@ -409,4 +443,10 @@ const drawEventNotification = (
     canvas.width / 2,
     10,
   );
+
+  if (event.round && event.currentSurprise) {
+    ctx.fillStyle = "#ff6100";
+    ctx.font = "16px Arial";
+    ctx.fillText(event.currentSurprise.name, canvas.width / 2, 40);
+  }
 };
