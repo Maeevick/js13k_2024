@@ -36,6 +36,11 @@ test(`when the game is initialized with a canvas of 100px * 100px,
     y: 930,
     radius: 50,
   };
+  const expectedEvent = {
+    ROUND_DURATION: 13_000,
+    round: 0,
+    timer: 0,
+  };
   expect(createInitialState(1000, 1000, () => 0.32)).toStrictEqual({
     canvas: expectedCanvas,
     joystick: expectedJoystick,
@@ -43,6 +48,7 @@ test(`when the game is initialized with a canvas of 100px * 100px,
     gameOver: expectedGameOverState,
     directions: expectedDirections,
     player: expectedPlayer,
+    event: expectedEvent,
   });
 });
 

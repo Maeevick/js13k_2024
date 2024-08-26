@@ -23,6 +23,11 @@ test(`when the game is updated and Game Over,
       left: false,
       right: false,
     },
+    event: {
+      ROUND_DURATION: 13_000,
+      round: 0,
+      timer: 0,
+    },
   };
   expect(updateGameState(initialGameState, 0)).toStrictEqual(initialGameState);
 });
@@ -47,6 +52,11 @@ test(`when the player collides with an ennemy,
       down: true,
       left: false,
       right: true,
+    },
+    event: {
+      ROUND_DURATION: 13_000,
+      round: 0,
+      timer: 0,
     },
   };
   const expectedGameState = {
@@ -75,9 +85,14 @@ test(`when the player collides with an ennemy,
       left: false,
       right: true,
     },
+    event: {
+      ROUND_DURATION: 13_000,
+      round: 0,
+      timer: 100,
+    },
   };
   expect(updateGameState(initialGameState, 100)).toStrictEqual(
-    expectedGameState,
+    expectedGameState
   );
 });
 
@@ -101,6 +116,11 @@ test(`when the player moves left for one frame,
       down: false,
       left: true,
       right: false,
+    },
+    event: {
+      ROUND_DURATION: 13_000,
+      round: 0,
+      timer: 0,
     },
   };
 
@@ -130,10 +150,15 @@ test(`when the player moves left for one frame,
       left: true,
       right: false,
     },
+    event: {
+      ROUND_DURATION: 13_000,
+      round: 0,
+      timer: 1000,
+    },
   };
 
   expect(updateGameState(initialGameState, 1000)).toStrictEqual(
-    expectedGameState,
+    expectedGameState
   );
 });
 
@@ -157,6 +182,11 @@ test(`when the player moves right for one frame,
       down: false,
       left: false,
       right: true,
+    },
+    event: {
+      ROUND_DURATION: 13_000,
+      round: 0,
+      timer: 0,
     },
   };
 
@@ -186,10 +216,15 @@ test(`when the player moves right for one frame,
       left: false,
       right: true,
     },
+    event: {
+      ROUND_DURATION: 13_000,
+      round: 0,
+      timer: 1000,
+    },
   };
 
   expect(updateGameState(initialGameState, 1000)).toStrictEqual(
-    expectedGameState,
+    expectedGameState
   );
 });
 
@@ -213,6 +248,11 @@ test(`when the player moves up for one frame,
       down: false,
       left: false,
       right: false,
+    },
+    event: {
+      ROUND_DURATION: 13_000,
+      round: 0,
+      timer: 0,
     },
   };
 
@@ -242,10 +282,15 @@ test(`when the player moves up for one frame,
       left: false,
       right: false,
     },
+    event: {
+      ROUND_DURATION: 13_000,
+      round: 0,
+      timer: 1000,
+    },
   };
 
   expect(updateGameState(initialGameState, 1000)).toStrictEqual(
-    expectedGameState,
+    expectedGameState
   );
 });
 
@@ -269,6 +314,11 @@ test(`when the player moves down for one frame,
       down: true,
       left: false,
       right: false,
+    },
+    event: {
+      ROUND_DURATION: 13_000,
+      round: 0,
+      timer: 0,
     },
   };
 
@@ -298,10 +348,15 @@ test(`when the player moves down for one frame,
       left: false,
       right: false,
     },
+    event: {
+      ROUND_DURATION: 13_000,
+      round: 0,
+      timer: 1000,
+    },
   };
 
   expect(updateGameState(initialGameState, 1000)).toStrictEqual(
-    expectedGameState,
+    expectedGameState
   );
 });
 
@@ -331,6 +386,11 @@ test(`when the game runs for one frame,
       left: false,
       right: false,
     },
+    event: {
+      ROUND_DURATION: 13_000,
+      round: 0,
+      timer: 0,
+    },
   };
 
   const expectedGameState = {
@@ -356,9 +416,63 @@ test(`when the game runs for one frame,
       left: false,
       right: false,
     },
+    event: {
+      ROUND_DURATION: 13_000,
+      round: 0,
+      timer: 1000,
+    },
   };
 
   expect(updateGameState(initialGameState, 1000)).toStrictEqual(
-    expectedGameState,
+    expectedGameState
+  );
+});
+
+test(`when the game runs for n round (each 13sec),
+  then
+      the event's timer counts the total time elapsed
+      and the event's round keeps the current round`, () => {
+  const initialGameState = {
+    canvas: { width: 100, height: 100 },
+    joystick: { x: 0, y: 0, radius: 10 },
+    gameOver: false,
+    player: {
+      id: "Player0",
+      x: 50,
+      y: 50,
+      radius: 5,
+      speed: 120,
+    },
+    enemies: [],
+    directions: {
+      up: false,
+      down: false,
+      left: false,
+      right: false,
+    },
+    event: {
+      ROUND_DURATION: 13_000,
+      round: 0,
+      timer: 0,
+    },
+  };
+
+  const expectedEventAfterOneRound = {
+    ROUND_DURATION: 13_000,
+    timer: 13_000,
+    round: 1,
+  };
+  const expectedEventAfterTwoRound = {
+    ROUND_DURATION: 13_000,
+    timer: 26_000,
+    round: 2,
+  };
+
+  expect(updateGameState(initialGameState, 13_000).event).toStrictEqual(
+    expectedEventAfterOneRound
+  );
+
+  expect(updateGameState(initialGameState, 26_000).event).toStrictEqual(
+    expectedEventAfterTwoRound
   );
 });

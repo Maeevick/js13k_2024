@@ -15,6 +15,11 @@ export type GameState = {
   };
   directions: { [key: string]: boolean };
   gameOver: boolean;
+  event: {
+    ROUND_DURATION: number;
+    round: number;
+    timer: number;
+  };
 };
 
 export const createInitialState = (
@@ -76,6 +81,11 @@ export const createInitialState = (
     },
     joystick: createTouchZone(canvasWidth, canvasHeight),
     gameOver: false,
+    event: {
+      ROUND_DURATION: 13_000,
+      round: 0,
+      timer: 0,
+    },
   };
 };
 
@@ -84,9 +94,12 @@ export const updateGameState = (
   deltaTime: number,
 ): GameState => {
   if (state.gameOver) return state;
+
   return checkCollisions(
     updatePlayerPosition(
-      checkEnemyCollisions(updateEnemyPositions(state, deltaTime)),
+      checkEnemyCollisions(
+        updateEnemyPositions(updateEvent(state, deltaTime), deltaTime),
+      ),
       deltaTime,
     ),
   );
@@ -148,6 +161,31 @@ const updateEnemyPositions = (
   };
 };
 
+const updateEvent = (state: GameState, deltaTime: number): GameState => {
+  const timer = state.event.timer + deltaTime;
+  const round = Math.floor(timer / state.event.ROUND_DURATION);
+
+  console.log("TIMER", state.event.timer, deltaTime, timer / 1000);
+  console.log("ROUND", round);
+
+  return {
+    ...state,
+    event: {
+      ...state.event,
+      timer,
+      round,
+    },
+  };
+};
+
+const checkCollisions = (state: GameState): GameState => {
+  const { player, enemies } = state;
+
+  const collision = enemies.some((enemy) => isColliding(player, enemy));
+
+  return collision ? { ...state, gameOver: true } : state;
+};
+
 const checkEnemyCollisions = (state: GameState): GameState => {
   const { enemies } = state;
   const result = enemies.reduce<{
@@ -202,14 +240,6 @@ const isColliding = (
   const distance = Math.sqrt(dx * dx + dy * dy);
 
   return distance < a.radius + b.radius;
-};
-
-const checkCollisions = (state: GameState): GameState => {
-  const { player, enemies } = state;
-
-  const collision = enemies.some((enemy) => isColliding(player, enemy));
-
-  return collision ? { ...state, gameOver: true } : state;
 };
 
 const createTouchZone = (

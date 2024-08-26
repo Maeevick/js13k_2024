@@ -149,7 +149,7 @@ const setupTouchEventListeners = (
 };
 
 const render = (state: RenderState): void => {
-  const { ctx, player, enemies, canvas, joystick, gameOver } = state;
+  const { ctx, player, enemies, canvas, joystick, gameOver, event } = state;
 
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 
@@ -158,6 +158,8 @@ const render = (state: RenderState): void => {
   enemies.forEach((enemy) => {
     drawEnemy(ctx, enemy);
   });
+
+  drawEventNotification(ctx, event, canvas);
 
   if (isToucheDevice()) {
     drawJoystick(ctx, joystick, state, canvas);
@@ -387,4 +389,24 @@ const drawJoystick = (
     joystickY + joystickSize / 2 - innerJoystickSize - 10,
   );
   ctx.stroke();
+};
+
+const drawEventNotification = (
+  ctx: CanvasRenderingContext2D,
+  event: {
+    ROUND_DURATION: number;
+    round: number;
+    timer: number;
+  },
+  canvas: { width: number; height: number },
+) => {
+  ctx.fillStyle = "black";
+  ctx.font = "20px Arial";
+  ctx.textAlign = "center";
+  ctx.textBaseline = "top";
+  ctx.fillText(
+    `Round: ${event.round} - Timer: ${Math.floor(event.timer / 1000)}s`,
+    canvas.width / 2,
+    10,
+  );
 };
