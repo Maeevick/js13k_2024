@@ -1,3 +1,19 @@
+export type Player = {
+  id: string;
+  x: number;
+  y: number;
+  radius: number;
+  speed: number;
+};
+
+export type Enemy = {
+  id: string;
+  x: number;
+  y: number;
+  radius: number;
+  speed: number;
+};
+
 export type Surprise = {
   id: number;
   name: string;
@@ -11,22 +27,16 @@ export type SpecialArea = {
 };
 
 export type GameState = {
-  player: { id: string; x: number; y: number; radius: number; speed: number };
-  enemies: Array<{
-    id: string;
-    x: number;
-    y: number;
-    radius: number;
-    speed: number;
-  }>;
-  specialAreas: SpecialArea[];
   canvas: { width: number; height: number };
+  player: Player;
+  enemies: Enemy[];
+  specialAreas: SpecialArea[];
+  directions: { [key: string]: boolean };
   joystick: {
     x: number;
     y: number;
     radius: number;
   };
-  directions: { [key: string]: boolean };
   controlsReversed: boolean;
   gameOver: boolean;
   event: {
@@ -37,6 +47,8 @@ export type GameState = {
     currentSurprise: Surprise | null;
   };
 };
+
+type Position = { x: number; y: number };
 
 const SURPRISES: Surprise[] = [
   { id: 1, name: "Holes Appear" },
@@ -57,7 +69,7 @@ const SURPRISES: Surprise[] = [
 export const createInitialState = (
   canvasWidth: number,
   canvasHeight: number,
-  random: () => number,
+  random: () => number
 ): GameState => {
   const player = {
     id: "Player0",
@@ -68,12 +80,13 @@ export const createInitialState = (
   };
 
   return {
+    canvas: { width: canvasWidth, height: canvasHeight },
     player,
     enemies: Array.from({ length: 5 }, (_, i) => {
       const { x, y } = createSafePosition(
         { width: canvasWidth, height: canvasHeight },
         { x: player.x, y: player.y },
-        random,
+        random
       );
 
       return {
@@ -85,7 +98,6 @@ export const createInitialState = (
       };
     }),
     specialAreas: [],
-    canvas: { width: canvasWidth, height: canvasHeight },
     directions: {
       left: false,
       right: false,
@@ -105,9 +117,9 @@ export const createInitialState = (
           SURPRISES[
             Math.max(
               0,
-              Math.min(SURPRISES.length - 1, Math.floor(random() * 13)),
+              Math.min(SURPRISES.length - 1, Math.floor(random() * 13))
             )
-          ],
+          ]
       ),
       currentSurprise: null,
     },
@@ -118,7 +130,7 @@ export const updateGameState = (
   state: GameState,
   deltaTime: number,
   random: () => number,
-  unique: () => number,
+  unique: () => number
 ): GameState => {
   if (state.gameOver) return state;
 
@@ -127,20 +139,20 @@ export const updateGameState = (
       checkEnemyCollisions(
         updateEnemyPositions(
           updateEvent(state, deltaTime, random, unique),
-          deltaTime,
+          deltaTime
         ),
-        unique,
+        unique
       ),
-      deltaTime,
-    ),
+      deltaTime
+    )
   );
 };
 
 const createSafePosition = (
   canvas: { width: number; height: number },
   player: { x: number; y: number },
-  random: () => number,
-) => {
+  random: () => number
+): Position => {
   let x = random() * canvas.width;
   let y = random() * canvas.height;
 
@@ -150,14 +162,14 @@ const createSafePosition = (
   if (Math.abs(dx) < 100) {
     x = Math.max(
       0,
-      Math.min(canvas.width, player.x + Math.abs(dx) * (100 / dx)),
+      Math.min(canvas.width, player.x + Math.abs(dx) * (100 / dx))
     );
   }
 
   if (Math.abs(dy) < 100) {
     y = Math.max(
       0,
-      Math.min(canvas.height, player.y + Math.abs(dy) * (100 / dy)),
+      Math.min(canvas.height, player.y + Math.abs(dy) * (100 / dy))
     );
   }
 
@@ -166,14 +178,14 @@ const createSafePosition = (
 
 const updatePlayerPosition = (
   state: GameState,
-  deltaTime: number,
+  deltaTime: number
 ): GameState => {
   const { player, directions, canvas, controlsReversed } = state;
 
   let moveDistance = player.speed * (deltaTime / 1000);
 
   const affectingArea = state.specialAreas.find((area) =>
-    isColliding(state.player, area),
+    isColliding(state.player, area)
   );
 
   if (affectingArea) {
@@ -195,8 +207,8 @@ const updatePlayerPosition = (
   const newX = isLeft
     ? Math.max(player.radius, player.x - moveDistance)
     : isRight
-      ? Math.min(canvas.width - player.radius, player.x + moveDistance)
-      : player.x;
+    ? Math.min(canvas.width - player.radius, player.x + moveDistance)
+    : player.x;
 
   const isUp = controlsReversed ? !directions.up : directions.up;
   const isDown = controlsReversed ? !directions.down : directions.down;
@@ -204,8 +216,8 @@ const updatePlayerPosition = (
   const newY = isUp
     ? Math.max(player.radius, player.y - moveDistance)
     : isDown
-      ? Math.min(canvas.height - player.radius, player.y + moveDistance)
-      : player.y;
+    ? Math.min(canvas.height - player.radius, player.y + moveDistance)
+    : player.y;
 
   return {
     ...state,
@@ -215,7 +227,7 @@ const updatePlayerPosition = (
 
 const updateEnemyPositions = (
   state: GameState,
-  deltaTime: number,
+  deltaTime: number
 ): GameState => {
   const { player, enemies, canvas } = state;
 
@@ -228,7 +240,7 @@ const updateEnemyPositions = (
       let moveDistance = (enemy.speed * (deltaTime / 1000)) / distance;
 
       const affectingArea = state.specialAreas.find((area) =>
-        isColliding(enemy, area),
+        isColliding(enemy, area)
       );
 
       if (affectingArea) {
@@ -267,7 +279,7 @@ const updateEvent = (
   state: GameState,
   deltaTime: number,
   random: () => number,
-  unique: () => number,
+  unique: () => number
 ): GameState => {
   const timer = state.event.timer + deltaTime;
   const round = Math.floor(timer / state.event.ROUND_DURATION);
@@ -286,7 +298,7 @@ const updateEvent = (
       updatedState,
       state.event.surprises[0].id,
       random,
-      unique,
+      unique
     );
     updatedState.event = {
       ...updatedState.event,
@@ -308,7 +320,7 @@ const checkCollisions = (state: GameState): GameState => {
 
 const checkEnemyCollisions = (
   state: GameState,
-  unique: () => number,
+  unique: () => number
 ): GameState => {
   const { enemies } = state;
   const result = enemies.reduce<{
@@ -321,7 +333,7 @@ const checkEnemyCollisions = (
       }
 
       const overlappingEnemies = enemies.filter(
-        (e, j) => i < j && isColliding(enemy, e),
+        (e, j) => i < j && isColliding(enemy, e)
       );
       if (overlappingEnemies.length === 0) {
         acc.newEnemies.add(enemy);
@@ -348,7 +360,7 @@ const checkEnemyCollisions = (
     {
       overlappingEnemies: new Set<string>(),
       newEnemies: new Set<GameState["enemies"][number]>(),
-    },
+    }
   );
 
   return { ...state, enemies: Array.from(result.newEnemies) };
@@ -358,7 +370,7 @@ const generateSpecialAreas = (
   count: number,
   type: SpecialArea["type"],
   state: GameState,
-  random: () => number,
+  random: () => number
 ): SpecialArea[] => {
   return Array.from({ length: count }, () => {
     const { x, y } = createSafePosition(state.canvas, state.player, random);
@@ -373,7 +385,7 @@ const generateSpecialAreas = (
 
 const isColliding = (
   a: { x: number; y: number; radius: number },
-  b: { x: number; y: number; radius: number },
+  b: { x: number; y: number; radius: number }
 ): boolean => {
   const dx = a.x - b.x;
   const dy = a.y - b.y;
@@ -386,7 +398,7 @@ const handleSurpriseAction = (
   state: GameState,
   eventId: number,
   random: () => number,
-  unique: () => number,
+  unique: () => number
 ): GameState => {
   switch (eventId) {
     case 1:
@@ -422,7 +434,7 @@ const handleSurpriseAction = (
 
 const handleHolesAppear = (
   state: GameState,
-  random: () => number,
+  random: () => number
 ): GameState => {
   const holes = generateSpecialAreas(3, "hole", state, random);
   return {
@@ -433,7 +445,7 @@ const handleHolesAppear = (
 
 const handleSlipperyFloor = (
   state: GameState,
-  random: () => number,
+  random: () => number
 ): GameState => {
   const slipperyAreas = generateSpecialAreas(3, "slippery", state, random);
   return {
@@ -444,7 +456,7 @@ const handleSlipperyFloor = (
 
 const handleStickyFloor = (
   state: GameState,
-  random: () => number,
+  random: () => number
 ): GameState => {
   const stickyAreas = generateSpecialAreas(3, "sticky", state, random);
   return {
@@ -459,7 +471,7 @@ const handleControlsReversed = (state: GameState): GameState => {
 
 const handleArenaShapeChange = (
   state: GameState,
-  random: () => number,
+  random: () => number
 ): GameState => {
   console.log("TODO: Arena Shape Change", random());
   return state;
@@ -468,7 +480,7 @@ const handleArenaShapeChange = (
 const handleSuperJasonAppears = (
   state: GameState,
   random: () => number,
-  unique: () => number,
+  unique: () => number
 ): GameState => {
   const { x, y } = createSafePosition(state.canvas, state.player, random);
   const superJason = {
@@ -487,7 +499,7 @@ const handleSuperJasonAppears = (
 const handleFourNewJasons = (
   state: GameState,
   random: () => number,
-  unique: () => number,
+  unique: () => number
 ): GameState => {
   const newJasons = Array.from({ length: 4 }, (_, i) => {
     const { x, y } = createSafePosition(state.canvas, state.player, random);
@@ -508,7 +520,7 @@ const handleFourNewJasons = (
 const handleDoubleJasons = (
   state: GameState,
   random: () => number,
-  unique: () => number,
+  unique: () => number
 ): GameState => {
   const newJasons = Array.from({ length: state.enemies.length }, (_, i) => {
     const { x, y } = createSafePosition(state.canvas, state.player, random);
@@ -558,7 +570,7 @@ const handlePlayerSlowDown = (state: GameState): GameState => {
 
 const handleOnlyBiggestJason = (state: GameState): GameState => {
   const biggestJason = state.enemies.reduce((prev, current) =>
-    prev.radius >= current.radius ? prev : current,
+    prev.radius >= current.radius ? prev : current
   );
   return {
     ...state,
@@ -588,7 +600,7 @@ const handleJasonsToEdges = (state: GameState): GameState => {
 
 const createTouchZone = (
   canvasWidth: number,
-  canvasHeight: number,
+  canvasHeight: number
 ): GameState["joystick"] => {
   const zoneSize = 100;
   return {
