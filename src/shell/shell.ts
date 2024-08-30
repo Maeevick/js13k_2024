@@ -265,10 +265,10 @@ const drawEnemy = (ctx: CanvasRenderingContext2D, enemy: Enemy): void => {
     enemy.radius * 2
   );
   ctx.fillStyle = "red";
-  ctx.font = "8px Arial";
+  ctx.font = "bold 6px Courier New";
   ctx.textAlign = "center";
   ctx.textBaseline = "middle";
-  ctx.fillText("XIII", enemy.x, enemy.y);
+  ctx.fillText("13", enemy.x, enemy.y);
 };
 
 const drawSpecialArea = (
@@ -306,7 +306,7 @@ const drawRestartButton = (
   ctx.fillRect(0, 0, canvas.width, canvas.height);
 
   ctx.fillStyle = "white";
-  ctx.font = "48px Arial";
+  ctx.font = "bold 20px Courier New";
   ctx.textAlign = "center";
   ctx.textBaseline = "middle";
   ctx.fillText("GAME OVER", canvas.width / 2, canvas.height / 2);
@@ -317,7 +317,7 @@ const drawRestartButton = (
   ctx.strokeRect(x, y, width, height);
 
   ctx.fillStyle = "black";
-  ctx.font = "20px Arial";
+  ctx.font = "bold 20px Courier New";
   ctx.fillText("RESTART", canvas.width / 2, y + height / 2);
 };
 
@@ -434,18 +434,22 @@ const drawEventNotification = (
   canvas: { width: number; height: number }
 ): void => {
   ctx.fillStyle = "black";
-  ctx.font = "20px Arial";
+  ctx.font = "bold 12px Courier New";
   ctx.textAlign = "center";
   ctx.textBaseline = "top";
   ctx.fillText(
-    `Round: ${event.round} - Timer: ${Math.floor(event.timer / 1000)}s`,
+    `ROUND: ${event.round} - TIMER: ${Math.floor(event.timer / 1000)}s`,
     canvas.width / 2,
     10
   );
 
   if (event.round && event.currentSurprise) {
     ctx.fillStyle = "#ff6100";
-    ctx.font = "16px Arial";
-    ctx.fillText(event.currentSurprise.name, canvas.width / 2, 40);
+    ctx.font = "bold 12px Courier New";
+    ctx.fillText(
+      event.currentSurprise.name.toUpperCase(),
+      canvas.width / 2,
+      40
+    );
   }
 };
