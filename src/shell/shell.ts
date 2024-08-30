@@ -87,14 +87,14 @@ const startGame = () => {
     handleArrowKeyPress,
     resetGame,
     handleTouchStart,
-    handleTouchMove
+    handleTouchMove,
   );
 
   requestAnimationFrame(gameLoop);
 };
 
 const setupCanvas = (
-  canvasId: string
+  canvasId: string,
 ): [HTMLCanvasElement, CanvasRenderingContext2D] => {
   const canvas = document.getElementById(canvasId) as HTMLCanvasElement;
   const ctx = canvas.getContext("2d")!;
@@ -106,7 +106,7 @@ const setupEventListeners = (
   handleArrowKeyPress: (key: string, isPressed: boolean) => void,
   resetGame: () => void,
   handleTouchStart: (event: TouchEvent) => void,
-  handleTouchMove: (event: TouchEvent) => void
+  handleTouchMove: (event: TouchEvent) => void,
 ) => {
   if (isToucheDevice()) {
     setupTouchEventListeners(canvas, handleTouchStart, handleTouchMove);
@@ -127,7 +127,7 @@ const setupEventListeners = (
 };
 
 const setupKeyboardEventListeners = (
-  handleArrowKeyPress: (key: string, isPressed: boolean) => void
+  handleArrowKeyPress: (key: string, isPressed: boolean) => void,
 ) => {
   window.addEventListener("keydown", (e) => {
     e.preventDefault();
@@ -146,7 +146,7 @@ const setupKeyboardEventListeners = (
 const setupTouchEventListeners = (
   canvas: HTMLCanvasElement,
   handleTouchStart: (event: TouchEvent) => void,
-  handleTouchMove: (event: TouchEvent) => void
+  handleTouchMove: (event: TouchEvent) => void,
 ) => {
   canvas.addEventListener("touchstart", handleTouchStart);
   canvas.addEventListener("touchmove", handleTouchMove);
@@ -262,7 +262,7 @@ const drawEnemy = (ctx: CanvasRenderingContext2D, enemy: Enemy): void => {
     enemy.x - enemy.radius,
     enemy.y - enemy.radius,
     enemy.radius * 2,
-    enemy.radius * 2
+    enemy.radius * 2,
   );
   ctx.fillStyle = "red";
   ctx.font = "bold 6px Courier New";
@@ -273,7 +273,7 @@ const drawEnemy = (ctx: CanvasRenderingContext2D, enemy: Enemy): void => {
 
 const drawSpecialArea = (
   ctx: CanvasRenderingContext2D,
-  area: SpecialArea
+  area: SpecialArea,
 ): void => {
   ctx.beginPath();
   ctx.arc(area.x, area.y, area.radius, 0, Math.PI * 2);
@@ -299,7 +299,7 @@ const drawRestartButton = (
     y: number;
     width: number;
     height: number;
-  }
+  },
 ): void => {
   const { x, y, width, height } = button;
   ctx.fillStyle = "rgba(0, 0, 0, 0.5)";
@@ -325,7 +325,7 @@ const drawJoystick = (
   ctx: CanvasRenderingContext2D,
   joystick: { x: number; y: number; radius: number },
   state: RenderState,
-  canvas: { width: number; height: number }
+  canvas: { width: number; height: number },
 ): void => {
   ctx.beginPath();
   ctx.moveTo(joystick.x, joystick.y);
@@ -335,7 +335,7 @@ const drawJoystick = (
         (state.directions.right ? 1 : state.directions.left ? -1 : 0),
     joystick.y +
       joystick.radius *
-        (state.directions.down ? 1 : state.directions.up ? -1 : 0)
+        (state.directions.down ? 1 : state.directions.up ? -1 : 0),
   );
   ctx.strokeStyle = "black";
   ctx.lineWidth = 2;
@@ -380,44 +380,44 @@ const drawJoystick = (
   ctx.beginPath();
   ctx.moveTo(
     joystickX - joystickSize / 2 + innerJoystickSize / 2,
-    joystickY - joystickSize / 2 + innerJoystickSize / 2
+    joystickY - joystickSize / 2 + innerJoystickSize / 2,
   );
   ctx.lineTo(
     joystickX - joystickSize / 2 + innerJoystickSize + 10,
-    joystickY - joystickSize / 2 + innerJoystickSize + 10
+    joystickY - joystickSize / 2 + innerJoystickSize + 10,
   );
   ctx.stroke();
 
   ctx.beginPath();
   ctx.moveTo(
     joystickX + joystickSize / 2 - innerJoystickSize / 2,
-    joystickY - joystickSize / 2 + innerJoystickSize / 2
+    joystickY - joystickSize / 2 + innerJoystickSize / 2,
   );
   ctx.lineTo(
     joystickX + joystickSize / 2 - innerJoystickSize - 10,
-    joystickY - joystickSize / 2 + innerJoystickSize + 10
+    joystickY - joystickSize / 2 + innerJoystickSize + 10,
   );
   ctx.stroke();
 
   ctx.beginPath();
   ctx.moveTo(
     joystickX - joystickSize / 2 + innerJoystickSize / 2,
-    joystickY + joystickSize / 2 - innerJoystickSize / 2
+    joystickY + joystickSize / 2 - innerJoystickSize / 2,
   );
   ctx.lineTo(
     joystickX - joystickSize / 2 + innerJoystickSize + 10,
-    joystickY + joystickSize / 2 - innerJoystickSize - 10
+    joystickY + joystickSize / 2 - innerJoystickSize - 10,
   );
   ctx.stroke();
 
   ctx.beginPath();
   ctx.moveTo(
     joystickX + joystickSize / 2 - innerJoystickSize / 2,
-    joystickY + joystickSize / 2 - innerJoystickSize / 2
+    joystickY + joystickSize / 2 - innerJoystickSize / 2,
   );
   ctx.lineTo(
     joystickX + joystickSize / 2 - innerJoystickSize - 10,
-    joystickY + joystickSize / 2 - innerJoystickSize - 10
+    joystickY + joystickSize / 2 - innerJoystickSize - 10,
   );
   ctx.stroke();
 };
@@ -430,17 +430,20 @@ const drawEventNotification = (
     timer: number;
     surprises: Surprise[];
     currentSurprise: Surprise | null;
+    currentScore: number;
   },
-  canvas: { width: number; height: number }
+  canvas: { width: number; height: number },
 ): void => {
   ctx.fillStyle = "black";
   ctx.font = "bold 12px Courier New";
   ctx.textAlign = "center";
   ctx.textBaseline = "top";
   ctx.fillText(
-    `ROUND: ${event.round} - TIMER: ${Math.floor(event.timer / 1000)}s`,
+    `SCORE: ${event.currentScore} - ROUND: ${event.round} - TIMER: ${Math.floor(
+      event.timer / 1000,
+    )}s`,
     canvas.width / 2,
-    10
+    10,
   );
 
   if (event.round && event.currentSurprise) {
@@ -449,7 +452,7 @@ const drawEventNotification = (
     ctx.fillText(
       event.currentSurprise.name.toUpperCase(),
       canvas.width / 2,
-      40
+      40,
     );
   }
 };

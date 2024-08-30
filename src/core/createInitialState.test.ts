@@ -45,6 +45,7 @@ test(`when the game is initialized with a canvas of 100px * 100px,
       name: "Controls Reversed",
     })),
     currentSurprise: null,
+    currentScore: 0,
   };
   expect(createInitialState(1000, 1000, () => 0.32)).toStrictEqual({
     canvas: expectedCanvas,
