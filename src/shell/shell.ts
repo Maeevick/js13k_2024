@@ -15,23 +15,45 @@ type RenderState = GameState & {
 
 export const run = () => {
   document.addEventListener("DOMContentLoaded", () => {
-    const startButton = document.getElementById("start") as HTMLButtonElement;
-    const game = document.getElementById("canvas") as HTMLCanvasElement;
+    const [canvas, ctx] = setupCanvas("canvas");
 
-    startButton.addEventListener("click", () => {
-      document.querySelectorAll(".home").forEach((element) => {
-        element.classList.add("hidden");
-      });
-
-      game.classList.remove("hidden");
-
-      startGame();
-    });
+    renderMenu(canvas, ctx);
   });
 };
 
-const startGame = () => {
-  const [canvas, ctx] = setupCanvas("canvas");
+const setupCanvas = (
+  canvasId: string,
+): [HTMLCanvasElement, CanvasRenderingContext2D] => {
+  const canvas = document.getElementById(canvasId) as HTMLCanvasElement;
+  const ctx = canvas.getContext("2d")!;
+
+  canvas.addEventListener("click", (e) => {
+    e.preventDefault();
+    const rect = canvas.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+
+    console.debug("x:y", { x, y });
+    if (y > 140 && y < 170 && x > 170 && x < 270) {
+      startGame(canvas, ctx);
+    }
+    if (y > 210 && y < 230 && x > 130 && x < 320) {
+      // HIGH SCORES
+      console.log("SHOW HISH SCORES");
+    }
+    if (y > 280 && y < 300 && x > 160 && x < 280) {
+      // CREDITS
+      console.log("SHOW CREDITS");
+    }
+  });
+
+  return [canvas, ctx];
+};
+
+const startGame = (
+  canvas: HTMLCanvasElement,
+  ctx: CanvasRenderingContext2D,
+) => {
   let state = createInitialState(canvas.width, canvas.height, Math.random);
 
   let lastTime = performance.now();
@@ -68,7 +90,7 @@ const startGame = () => {
 
     state = updateGameState(state, deltaTime, Math.random, Date.now);
 
-    render({ ...state, ctx, restartButton: null });
+    renderGame({ ...state, ctx, restartButton: null });
 
     if (!state.gameOver) {
       requestAnimationFrame(gameLoop);
@@ -91,14 +113,6 @@ const startGame = () => {
   );
 
   requestAnimationFrame(gameLoop);
-};
-
-const setupCanvas = (
-  canvasId: string,
-): [HTMLCanvasElement, CanvasRenderingContext2D] => {
-  const canvas = document.getElementById(canvasId) as HTMLCanvasElement;
-  const ctx = canvas.getContext("2d")!;
-  return [canvas, ctx];
 };
 
 const setupEventListeners = (
@@ -152,7 +166,44 @@ const setupTouchEventListeners = (
   canvas.addEventListener("touchmove", handleTouchMove);
 };
 
-const render = (state: RenderState): void => {
+const renderMenu = (
+  canvas: HTMLCanvasElement,
+  ctx: CanvasRenderingContext2D,
+): void => {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  ctx.fillStyle = "rgba(0, 0, 0, 1)";
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+  ctx.textAlign = "center";
+  ctx.textBaseline = "middle";
+
+  ctx.fillStyle = "#FF6100";
+  ctx.font = "bold 30px Courier New";
+  ctx.fillText("TRISKAIDEK ARENA", canvas.width / 2, 30);
+  ctx.strokeStyle = "#FF6100";
+  ctx.strokeRect(20, 40, 280, 1);
+
+  ctx.font = "bold 20px Courier New";
+
+  ctx.fillStyle = "yellow";
+  ctx.fillText("START", 160, 110);
+
+  ctx.fillStyle = "green";
+  ctx.fillText("HIGH SCORES", 160, 160);
+  ctx.fillText("CREDITS", 160, 210);
+
+  ctx.fillStyle = "cyan";
+  ctx.font = "bold 10px Courier New";
+  ctx.textAlign = "left";
+  ctx.fillText("1 free coin to flee", 10, 310);
+
+  ctx.fillStyle = "#FF6100";
+  ctx.textAlign = "right";
+  ctx.fillText("A MicroGame by Maeevick", 310, 310);
+};
+
+const renderGame = (state: RenderState): void => {
   const {
     ctx,
     player,
