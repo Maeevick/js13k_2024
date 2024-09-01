@@ -26,18 +26,25 @@ export type SpecialArea = {
   type: "hole" | "slippery" | "sticky";
 };
 
+export type MenuOptions = "START" | "HIGH SCORES" | "CREDITS";
+
 export type GameState = {
   canvas: { width: number; height: number };
   player: Player;
   enemies: Enemy[];
   specialAreas: SpecialArea[];
   directions: { [key: string]: boolean };
-  joystick: {
-    x: number;
-    y: number;
-    radius: number;
-  };
+  // joystick: {
+  //   x: number;
+  //   y: number;
+  //   radius: number;
+  // };
   controlsReversed: boolean;
+  menu: {
+    displayed: boolean;
+    selected: MenuOptions;
+    options: MenuOptions[];
+  };
   gameOver: boolean;
   event: {
     ROUND_DURATION: number;
@@ -106,7 +113,12 @@ export const createInitialState = (
       down: false,
     },
     controlsReversed: false,
-    joystick: createTouchZone(canvasWidth, canvasHeight),
+    // joystick: createTouchZone(canvasWidth, canvasHeight),
+    menu: {
+      displayed: true,
+      selected: "START",
+      options: ["START", "HIGH SCORES", "CREDITS"],
+    },
     gameOver: false,
     event: {
       ROUND_DURATION: 13_000,
@@ -156,17 +168,17 @@ const createSafePosition = (
   return { x, y };
 };
 
-const createTouchZone = (
-  canvasWidth: number,
-  canvasHeight: number,
-): GameState["joystick"] => {
-  const zoneSize = 100;
-  return {
-    x: canvasWidth - zoneSize / 2 - 20,
-    y: canvasHeight - zoneSize / 2 - 20,
-    radius: zoneSize / 2,
-  };
-};
+// const createTouchZone = (
+//   canvasWidth: number,
+//   canvasHeight: number
+// ): GameState["joystick"] => {
+//   const zoneSize = 100;
+//   return {
+//     x: canvasWidth - zoneSize / 2 - 20,
+//     y: canvasHeight - zoneSize / 2 - 20,
+//     radius: zoneSize / 2,
+//   };
+// };
 
 export const updateGameState = (
   state: GameState,

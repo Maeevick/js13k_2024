@@ -31,11 +31,11 @@ test(`when the game is initialized with a canvas of 100px * 100px,
     x: 500,
     y: 500,
   };
-  const expectedJoystick = {
-    x: 930,
-    y: 930,
-    radius: 50,
-  };
+  // const expectedJoystick = {
+  //   x: 930,
+  //   y: 930,
+  //   radius: 50,
+  // };
   const expectedEvent = {
     ROUND_DURATION: 13_000,
     round: 0,
@@ -49,7 +49,12 @@ test(`when the game is initialized with a canvas of 100px * 100px,
   };
   expect(createInitialState(1000, 1000, () => 0.32)).toStrictEqual({
     canvas: expectedCanvas,
-    joystick: expectedJoystick,
+    // joystick: expectedJoystick,
+    menu: {
+      displayed: true,
+      selected: "START",
+      options: ["START", "HIGH SCORES", "CREDITS"],
+    },
     enemies: expectedEnnemies,
     specialAreas: [],
     gameOver: expectedGameOverState,

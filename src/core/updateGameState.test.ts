@@ -1,6 +1,6 @@
 import { expect, test } from "vitest";
 
-import { updateGameState } from "./core.ts";
+import { MenuOptions, updateGameState } from "./core.ts";
 
 test(`when the game is updated and Game Over, 
     then 
@@ -10,7 +10,12 @@ test(`when the game is updated and Game Over,
 
   const initialGameState = {
     canvas: { width: 100, height: 100 },
-    joystick: { x: 80, y: 80, radius: 10 },
+    // joystick: { x: 80, y: 80, radius: 10 },
+    menu: {
+      displayed: true,
+      selected: "START" as MenuOptions,
+      options: ["START", "HIGH SCORES", "CREDITS"] as MenuOptions[],
+    },
     gameOver: true,
     player: {
       id: "Player0",
@@ -53,7 +58,12 @@ test(`when the player collides with an ennemy,
 
   const initialGameState = {
     canvas: { width: 100, height: 100 },
-    joystick: { x: 80, y: 80, radius: 10 },
+    // joystick: { x: 80, y: 80, radius: 10 },
+    menu: {
+      displayed: true,
+      selected: "START" as MenuOptions,
+      options: ["START", "HIGH SCORES", "CREDITS"] as MenuOptions[],
+    },
     gameOver: false,
     player: {
       id: "Player0",
@@ -85,7 +95,12 @@ test(`when the player collides with an ennemy,
   };
   const expectedGameState = {
     canvas: { width: 100, height: 100 },
-    joystick: { x: 80, y: 80, radius: 10 },
+    // joystick: { x: 80, y: 80, radius: 10 },
+    menu: {
+      displayed: true,
+      selected: "START" as MenuOptions,
+      options: ["START", "HIGH SCORES", "CREDITS"] as MenuOptions[],
+    },
     gameOver: true,
     player: {
       id: "Player0",
@@ -136,7 +151,12 @@ test(`when the player moves left for one frame,
 
   const initialGameState = {
     canvas: { width: 1000, height: 1000 },
-    joystick: { x: 80, y: 80, radius: 10 },
+    // joystick: { x: 80, y: 80, radius: 10 },
+    menu: {
+      displayed: true,
+      selected: "START" as MenuOptions,
+      options: ["START", "HIGH SCORES", "CREDITS"] as MenuOptions[],
+    },
     gameOver: false,
     player: {
       id: "Player0",
@@ -169,7 +189,12 @@ test(`when the player moves left for one frame,
 
   const expectedGameState = {
     canvas: { width: 1000, height: 1000 },
-    joystick: { x: 80, y: 80, radius: 10 },
+    // joystick: { x: 80, y: 80, radius: 10 },
+    menu: {
+      displayed: true,
+      selected: "START" as MenuOptions,
+      options: ["START", "HIGH SCORES", "CREDITS"] as MenuOptions[],
+    },
     gameOver: false,
     player: {
       id: "Player0",
@@ -221,7 +246,12 @@ test(`when the player moves right for one frame,
 
   const initialGameState = {
     canvas: { width: 1000, height: 1000 },
-    joystick: { x: 80, y: 80, radius: 10 },
+    // joystick: { x: 80, y: 80, radius: 10 },
+    menu: {
+      displayed: true,
+      selected: "START" as MenuOptions,
+      options: ["START", "HIGH SCORES", "CREDITS"] as MenuOptions[],
+    },
     gameOver: false,
     player: {
       id: "Player0",
@@ -254,7 +284,12 @@ test(`when the player moves right for one frame,
 
   const expectedGameState = {
     canvas: { width: 1000, height: 1000 },
-    joystick: { x: 80, y: 80, radius: 10 },
+    // joystick: { x: 80, y: 80, radius: 10 },
+    menu: {
+      displayed: true,
+      selected: "START" as MenuOptions,
+      options: ["START", "HIGH SCORES", "CREDITS"] as MenuOptions[],
+    },
     gameOver: false,
     player: {
       id: "Player0",
@@ -306,7 +341,12 @@ test(`when the player moves up for one frame,
 
   const initialGameState = {
     canvas: { width: 1000, height: 1000 },
-    joystick: { x: 80, y: 80, radius: 10 },
+    // joystick: { x: 80, y: 80, radius: 10 },
+    menu: {
+      displayed: true,
+      selected: "START" as MenuOptions,
+      options: ["START", "HIGH SCORES", "CREDITS"] as MenuOptions[],
+    },
     gameOver: false,
     player: {
       id: "Player0",
@@ -339,7 +379,12 @@ test(`when the player moves up for one frame,
 
   const expectedGameState = {
     canvas: { width: 1000, height: 1000 },
-    joystick: { x: 80, y: 80, radius: 10 },
+    // joystick: { x: 80, y: 80, radius: 10 },
+    menu: {
+      displayed: true,
+      selected: "START" as MenuOptions,
+      options: ["START", "HIGH SCORES", "CREDITS"] as MenuOptions[],
+    },
     gameOver: false,
     player: {
       id: "Player0",
@@ -391,7 +436,12 @@ test(`when the player moves down for one frame,
 
   const initialGameState = {
     canvas: { width: 1000, height: 1000 },
-    joystick: { x: 80, y: 80, radius: 10 },
+    // joystick: { x: 80, y: 80, radius: 10 },
+    menu: {
+      displayed: true,
+      selected: "START" as MenuOptions,
+      options: ["START", "HIGH SCORES", "CREDITS"] as MenuOptions[],
+    },
     gameOver: false,
     player: {
       id: "Player0",
@@ -424,7 +474,12 @@ test(`when the player moves down for one frame,
 
   const expectedGameState = {
     canvas: { width: 1000, height: 1000 },
-    joystick: { x: 80, y: 80, radius: 10 },
+    // joystick: { x: 80, y: 80, radius: 10 },
+    menu: {
+      displayed: true,
+      selected: "START" as MenuOptions,
+      options: ["START", "HIGH SCORES", "CREDITS"] as MenuOptions[],
+    },
     gameOver: false,
     player: {
       id: "Player0",
@@ -476,7 +531,12 @@ test(`when the game runs for one frame,
 
   const initialGameState = {
     canvas: { width: 1000, height: 1000 },
-    joystick: { x: 80, y: 80, radius: 10 },
+    // joystick: { x: 80, y: 80, radius: 10 },
+    menu: {
+      displayed: true,
+      selected: "START" as MenuOptions,
+      options: ["START", "HIGH SCORES", "CREDITS"] as MenuOptions[],
+    },
     gameOver: false,
     player: {
       id: "Player0",
@@ -514,7 +574,12 @@ test(`when the game runs for one frame,
 
   const expectedGameState = {
     canvas: { width: 1000, height: 1000 },
-    joystick: { x: 80, y: 80, radius: 10 },
+    // joystick: { x: 80, y: 80, radius: 10 },
+    menu: {
+      displayed: true,
+      selected: "START" as MenuOptions,
+      options: ["START", "HIGH SCORES", "CREDITS"] as MenuOptions[],
+    },
     gameOver: false,
     player: {
       id: "Player0",
@@ -564,7 +629,12 @@ test(`when the game runs for n round (each 13sec),
 
   const initialGameState = {
     canvas: { width: 100, height: 100 },
-    joystick: { x: 0, y: 0, radius: 10 },
+    // joystick: { x: 0, y: 0, radius: 10 },
+    menu: {
+      displayed: true,
+      selected: "START" as MenuOptions,
+      options: ["START", "HIGH SCORES", "CREDITS"] as MenuOptions[],
+    },
     gameOver: false,
     player: {
       id: "Player0",
@@ -677,7 +747,12 @@ test(`when the surprise "Jason Speed Up" is fired,
 
   const initialGameState = {
     canvas: { width: 100, height: 100 },
-    joystick: { x: 0, y: 0, radius: 10 },
+    // joystick: { x: 0, y: 0, radius: 10 },
+    menu: {
+      displayed: true,
+      selected: "START" as MenuOptions,
+      options: ["START", "HIGH SCORES", "CREDITS"] as MenuOptions[],
+    },
     gameOver: false,
     player: {
       id: "Player0",
@@ -730,7 +805,12 @@ test(`when the surprise "Player Speed Up" is fired,
 
   const initialGameState = {
     canvas: { width: 100, height: 100 },
-    joystick: { x: 0, y: 0, radius: 10 },
+    // joystick: { x: 0, y: 0, radius: 10 },
+    menu: {
+      displayed: true,
+      selected: "START" as MenuOptions,
+      options: ["START", "HIGH SCORES", "CREDITS"] as MenuOptions[],
+    },
     gameOver: false,
     player: {
       id: "Player0",
@@ -779,7 +859,12 @@ test(`when the surprise "Player Speed Up" is fired,
 
   const initialGameState = {
     canvas: { width: 100, height: 100 },
-    joystick: { x: 0, y: 0, radius: 10 },
+    // joystick: { x: 0, y: 0, radius: 10 },
+    menu: {
+      displayed: true,
+      selected: "START" as MenuOptions,
+      options: ["START", "HIGH SCORES", "CREDITS"] as MenuOptions[],
+    },
     gameOver: false,
     player: {
       id: "Player0",
@@ -828,7 +913,12 @@ test(`when the surprise "Player Speed Up" is fired,
 
   const initialGameState = {
     canvas: { width: 100, height: 100 },
-    joystick: { x: 0, y: 0, radius: 10 },
+    // joystick: { x: 0, y: 0, radius: 10 },
+    menu: {
+      displayed: true,
+      selected: "START" as MenuOptions,
+      options: ["START", "HIGH SCORES", "CREDITS"] as MenuOptions[],
+    },
     gameOver: false,
     player: {
       id: "Player0",
@@ -877,7 +967,12 @@ test(`when the surprise "Only Biggest Jason" is fired,
 
   const initialGameState = {
     canvas: { width: 100, height: 100 },
-    joystick: { x: 0, y: 0, radius: 10 },
+    // joystick: { x: 0, y: 0, radius: 10 },
+    menu: {
+      displayed: true,
+      selected: "START" as MenuOptions,
+      options: ["START", "HIGH SCORES", "CREDITS"] as MenuOptions[],
+    },
     gameOver: false,
     player: {
       id: "Player0",
@@ -927,7 +1022,12 @@ test(`when the surprise "Only Biggest Jason" is fired and all the Jasons have th
 
   const initialGameState = {
     canvas: { width: 100, height: 100 },
-    joystick: { x: 0, y: 0, radius: 10 },
+    // joystick: { x: 0, y: 0, radius: 10 },
+    menu: {
+      displayed: true,
+      selected: "START" as MenuOptions,
+      options: ["START", "HIGH SCORES", "CREDITS"] as MenuOptions[],
+    },
     gameOver: false,
     player: {
       id: "Player0",
@@ -977,7 +1077,12 @@ test(`when the surprise "Controls Reversed" is fired,
 
   const initialGameState = {
     canvas: { width: 100, height: 100 },
-    joystick: { x: 0, y: 0, radius: 10 },
+    // joystick: { x: 0, y: 0, radius: 10 },
+    menu: {
+      displayed: true,
+      selected: "START" as MenuOptions,
+      options: ["START", "HIGH SCORES", "CREDITS"] as MenuOptions[],
+    },
     gameOver: false,
     player: {
       id: "Player0",
@@ -1033,7 +1138,12 @@ test(`when the surprise "Super-Jason Appears" is fired,
 
   const initialGameState = {
     canvas: { width: 100, height: 100 },
-    joystick: { x: 0, y: 0, radius: 10 },
+    // joystick: { x: 0, y: 0, radius: 10 },
+    menu: {
+      displayed: true,
+      selected: "START" as MenuOptions,
+      options: ["START", "HIGH SCORES", "CREDITS"] as MenuOptions[],
+    },
     gameOver: false,
     player: {
       id: "Player0",
@@ -1074,7 +1184,12 @@ test(`when the surprise "Holes Appear" is fired,
 
   const initialGameState = {
     canvas: { width: 1000, height: 1000 },
-    joystick: { x: 0, y: 0, radius: 10 },
+    // joystick: { x: 0, y: 0, radius: 10 },
+    menu: {
+      displayed: true,
+      selected: "START" as MenuOptions,
+      options: ["START", "HIGH SCORES", "CREDITS"] as MenuOptions[],
+    },
     gameOver: false,
     player: {
       id: "Player0",
@@ -1120,7 +1235,12 @@ test(`when the surprise "Slippery Floor" is fired,
 
   const initialGameState = {
     canvas: { width: 1000, height: 1000 },
-    joystick: { x: 0, y: 0, radius: 10 },
+    // joystick: { x: 0, y: 0, radius: 10 },
+    menu: {
+      displayed: true,
+      selected: "START" as MenuOptions,
+      options: ["START", "HIGH SCORES", "CREDITS"] as MenuOptions[],
+    },
     gameOver: false,
     player: {
       id: "Player0",
@@ -1166,7 +1286,12 @@ test(`when the surprise "Sticky Floor" is fired,
 
   const initialGameState = {
     canvas: { width: 1000, height: 1000 },
-    joystick: { x: 0, y: 0, radius: 10 },
+    // joystick: { x: 0, y: 0, radius: 10 },
+    menu: {
+      displayed: true,
+      selected: "START" as MenuOptions,
+      options: ["START", "HIGH SCORES", "CREDITS"] as MenuOptions[],
+    },
     gameOver: false,
     player: {
       id: "Player0",
