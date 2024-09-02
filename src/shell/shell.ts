@@ -23,7 +23,7 @@ export const run = () => {
 };
 
 const setupCanvas = (
-  canvasId: string,
+  canvasId: string
 ): [HTMLCanvasElement, CanvasRenderingContext2D] => {
   const canvas = document.getElementById(canvasId) as HTMLCanvasElement;
   const ctx = canvas.getContext("2d")!;
@@ -33,7 +33,7 @@ const setupCanvas = (
 
 const startGame = (
   canvas: HTMLCanvasElement,
-  ctx: CanvasRenderingContext2D,
+  ctx: CanvasRenderingContext2D
 ) => {
   let state = createInitialState(canvas.width, canvas.height, Math.random);
 
@@ -141,7 +141,7 @@ const startGame = (
     handleMenuNavigation,
     handleMenuValidation,
     handleArrowKeyPress,
-    resetGame,
+    resetGame
     // handleTouchStart,
     // handleTouchMove
   );
@@ -154,7 +154,7 @@ const setupEventListeners = (
   handleMenuNavigation: (key: string) => void,
   handleMenuValidation: (key: string) => void,
   handleArrowKeyPress: (key: string, isPressed: boolean) => void,
-  resetGame: () => void,
+  resetGame: () => void
   // handleTouchStart: (event: TouchEvent) => void,
   // handleTouchMove: (event: TouchEvent) => void
 ) => {
@@ -177,7 +177,7 @@ const setupEventListeners = (
 };
 
 const setupKeyboardEventListeners = (
-  handleArrowKeyPress: (key: string, isPressed: boolean) => void,
+  handleArrowKeyPress: (key: string, isPressed: boolean) => void
 ) => {
   window.addEventListener("keydown", (e) => {
     e.preventDefault();
@@ -348,7 +348,7 @@ const drawEnemy = (ctx: CanvasRenderingContext2D, enemy: Enemy): void => {
     enemy.x - enemy.radius,
     enemy.y - enemy.radius,
     enemy.radius * 2,
-    enemy.radius * 2,
+    enemy.radius * 2
   );
   ctx.fillStyle = "red";
   ctx.font = "bold 6px Courier New";
@@ -359,7 +359,7 @@ const drawEnemy = (ctx: CanvasRenderingContext2D, enemy: Enemy): void => {
 
 const drawSpecialArea = (
   ctx: CanvasRenderingContext2D,
-  area: SpecialArea,
+  area: SpecialArea
 ): void => {
   ctx.beginPath();
   ctx.arc(area.x, area.y, area.radius, 0, Math.PI * 2);
@@ -385,7 +385,7 @@ const drawRestartButton = (
     y: number;
     width: number;
     height: number;
-  },
+  }
 ): void => {
   const { x, y, width, height } = button;
   ctx.fillStyle = "rgba(0, 0, 0, 0.5)";
@@ -518,18 +518,18 @@ const drawEventNotification = (
     currentSurprise: Surprise | null;
     currentScore: number;
   },
-  canvas: { width: number; height: number },
+  canvas: { width: number; height: number }
 ): void => {
   ctx.fillStyle = "black";
   ctx.font = "bold 12px Courier New";
   ctx.textAlign = "center";
   ctx.textBaseline = "top";
   ctx.fillText(
-    `SCORE: ${event.currentScore} - ROUND: ${event.round} - TIMER: ${Math.floor(
-      event.timer / 1000,
-    )}s`,
+    `SCORE: ${event.currentScore} - ROUND: ${
+      event.round + 1
+    } - TIMER: ${Math.floor(event.timer / 1000)}s`,
     canvas.width / 2,
-    10,
+    10
   );
 
   if (event.round && event.currentSurprise) {
@@ -538,7 +538,7 @@ const drawEventNotification = (
     ctx.fillText(
       event.currentSurprise.name.toUpperCase(),
       canvas.width / 2,
-      40,
+      40
     );
   }
 };
