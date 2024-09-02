@@ -36,7 +36,9 @@ export type GameState = {
   directions: { [key: string]: boolean };
   controlsReversed: boolean;
   menu: {
-    displayed: boolean;
+    main: boolean;
+    scores: boolean;
+    credits: boolean;
     selected: MenuOptions;
     options: MenuOptions[];
   };
@@ -70,10 +72,25 @@ const SURPRISES: Surprise[] = [
   { id: 13, name: "Only Biggest Jason" },
 ];
 
+export const CREDITS: string[] = [
+  "GAME MAKER: MAEEVICK",
+  "",
+  "SPECIAL THANKS TO:",
+  "JS13K",
+  "JOHN DOE",
+  "JOHN DOE",
+  "JOHN DOE",
+  "JOHN DOE",
+  "JOHN DOE",
+  "JOHN DOE",
+  "AND MANY MORE...",
+];
+
 export const createInitialState = (
   canvasWidth: number,
   canvasHeight: number,
   random: () => number,
+  showMainMenu = true,
 ): GameState => {
   const player = {
     id: "Player0",
@@ -110,7 +127,9 @@ export const createInitialState = (
     },
     controlsReversed: false,
     menu: {
-      displayed: true,
+      main: showMainMenu,
+      scores: false,
+      credits: false,
       selected: "START",
       options: ["START", "HIGH SCORES", "CREDITS"],
     },

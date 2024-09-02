@@ -1,13 +1,13 @@
-import {
-  createInitialState,
+import type {
   Enemy,
   MenuOptions,
   Player,
   SpecialArea,
   Surprise,
-  updateGameState,
-  type GameState,
+  GameState,
 } from "../core/core.ts";
+
+import { CREDITS, createInitialState, updateGameState } from "../core/core.ts";
 
 type RenderState = GameState & {
   ctx: CanvasRenderingContext2D;
@@ -54,7 +54,7 @@ const startGame = (
   };
 
   const handleMenuNavigation = (key: string) => {
-    if (state.menu.displayed) {
+    if (state.menu.main) {
       const fromSelectedToNext: Record<
         string,
         Record<MenuOptions, MenuOptions>
@@ -83,18 +83,26 @@ const startGame = (
   };
 
   const handleMenuValidation = (key: string) => {
-    if ("Enter" === key && (state.menu.displayed || state.gameOver)) {
-      if (state.gameOver) {
+    if ("Enter" === key) {
+      if (state.menu.main && state.menu.selected === "START") {
+        state.menu.main = false;
+        state.menu.scores = false;
+        state.menu.credits = false;
+        state.gameOver = false;
+      } else if (state.menu.main && state.menu.selected === "HIGH SCORES") {
+        state.menu.main = false;
+        state.menu.scores = true;
+        state.menu.credits = false;
+      } else if (state.menu.main && state.menu.selected === "CREDITS") {
+        state.menu.main = false;
+        state.menu.scores = false;
+        state.menu.credits = true;
+      } else if (state.menu.scores || state.menu.credits || state.youWin) {
+        state.menu.scores = false;
+        state.menu.credits = false;
+        state.menu.main = true;
+      } else {
         resetGame();
-      }
-      if (state.menu.selected === "START") {
-        state.menu.displayed = false;
-      }
-      if (state.menu.selected === "HIGH SCORES") {
-        console.log("GO TO HIGH SCORES");
-      }
-      if (state.menu.selected === "CREDITS") {
-        console.log("GO TO CREDITS");
       }
       requestAnimationFrame(gameLoop);
     }
@@ -106,21 +114,29 @@ const startGame = (
 
     state = updateGameState(state, deltaTime, Math.random, Date.now);
 
-    if (state.menu.displayed) {
+    if (state.menu.main) {
       renderMenu({ ...state, ctx, restartButton: null });
+    } else if (state.menu.scores) {
+      renderHighScores({ ...state, ctx, restartButton: null });
+    } else if (state.menu.credits) {
+      renderCredits({ ...state, ctx, restartButton: null });
     } else {
       renderGame({ ...state, ctx, restartButton: null });
     }
 
-    if (!state.gameOver && !state.menu.displayed) {
+    if (!state.gameOver) {
       requestAnimationFrame(gameLoop);
     }
   };
 
   const resetGame = () => {
     if (state.gameOver) {
-      state = createInitialState(canvas.width, canvas.height, Math.random);
-      requestAnimationFrame(gameLoop);
+      state = createInitialState(
+        canvas.width,
+        canvas.height,
+        Math.random,
+        false,
+      );
     }
   };
 
@@ -128,7 +144,6 @@ const startGame = (
     handleMenuNavigation,
     handleMenuValidation,
     handleArrowKeyPress,
-    resetGame,
   );
 
   requestAnimationFrame(gameLoop);
@@ -138,7 +153,6 @@ const setupEventListeners = (
   handleMenuNavigation: (key: string) => void,
   handleMenuValidation: (key: string) => void,
   handleArrowKeyPress: (key: string, isPressed: boolean) => void,
-  resetGame: () => void,
 ) => {
   window.addEventListener("keydown", (e) => {
     e.preventDefault();
@@ -147,7 +161,6 @@ const setupEventListeners = (
     }
     if ("Enter" === e.key) {
       handleMenuValidation(e.key);
-      resetGame();
     }
   });
 
@@ -189,13 +202,11 @@ const renderMenu = (state: RenderState): void => {
 
   ctx.font = "bold 20px Courier New";
 
-  console.log("SELECTED", Date.now(), state.menu.selected);
-
   menu.options.forEach((opt, i) => {
     const color = opt === menu.selected ? "yellow" : "green";
 
     ctx.fillStyle = color;
-    ctx.fillText(opt, 160, 110 + i * 50);
+    ctx.fillText(opt, canvas.width / 2, 110 + i * 50);
   });
 
   ctx.fillStyle = "cyan";
@@ -208,6 +219,87 @@ const renderMenu = (state: RenderState): void => {
   ctx.fillText("A MicroGame by Maeevick", 310, 310);
 };
 
+const renderHighScores = (state: RenderState): void => {
+  const { canvas, ctx } = state;
+
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  ctx.fillStyle = "rgba(0, 0, 0, 1)";
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+  ctx.textAlign = "center";
+  ctx.textBaseline = "middle";
+  ctx.fillStyle = "#FF6100";
+  ctx.font = "bold 30px Courier New";
+  ctx.fillText("HIGH SCORES", canvas.width / 2, 30);
+  ctx.strokeStyle = "#FF6100";
+  ctx.strokeRect(20, 40, 280, 1);
+
+  ctx.font = "bold 20px Courier New";
+
+  [
+    "AAA: 13.000",
+    "BBB: 12.999",
+    "CCC: 9.999",
+    "DDD: 7.777",
+    "EEE: 6.666",
+    "FFF: 5.555",
+    "GGG: 4.444",
+    "HHH: 42",
+    "III: 4",
+    "JJJ: 1",
+  ].forEach((cred, i) => {
+    ctx.fillStyle = i % 2 ? "yellow" : "green";
+    ctx.fillText(cred, canvas.width / 2, 60 + i * 20);
+  });
+
+  drawBackButton(canvas, ctx);
+};
+const renderCredits = (state: RenderState): void => {
+  const { canvas, ctx } = state;
+
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  ctx.fillStyle = "rgba(0, 0, 0, 1)";
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+  ctx.textAlign = "center";
+  ctx.textBaseline = "middle";
+  ctx.fillStyle = "#FF6100";
+  ctx.font = "bold 30px Courier New";
+  ctx.fillText("CREDITS", canvas.width / 2, 30);
+  ctx.strokeStyle = "#FF6100";
+  ctx.strokeRect(20, 40, 280, 1);
+
+  ctx.font = "bold 20px Courier New";
+
+  CREDITS.forEach((cred, i) => {
+    ctx.fillStyle = i % 2 ? "yellow" : "green";
+    ctx.fillText(cred, canvas.width / 2, 60 + i * 20);
+  });
+
+  drawBackButton(canvas, ctx);
+};
+
+const drawBackButton = (
+  canvas: { width: number; height: number },
+  ctx: CanvasRenderingContext2D,
+): void => {
+  const width = 100;
+  const height = 40;
+  const x = canvas.width / 2 - 50;
+  const y = canvas.height - 50;
+
+  ctx.fillStyle = "white";
+  ctx.fillRect(x, y, width, height);
+  ctx.strokeStyle = "black";
+  ctx.strokeRect(x, y, width, height);
+
+  ctx.fillStyle = "black";
+  ctx.font = "bold 20px Courier New";
+  ctx.fillText("BACK", canvas.width / 2, y + height / 2);
+};
+
 const renderGame = (state: RenderState): void => {
   const {
     ctx,
@@ -215,7 +307,6 @@ const renderGame = (state: RenderState): void => {
     enemies,
     specialAreas,
     canvas,
-    // joystick,
     gameOver,
     youWin,
     event,
@@ -340,107 +431,6 @@ const drawEndGame = (
   ctx.font = "bold 20px Courier New";
   ctx.fillText("RESTART", canvas.width / 2, y + height / 2);
 };
-
-// const drawJoystick = (
-//   ctx: CanvasRenderingContext2D,
-//   joystick: { x: number; y: number; radius: number },
-//   state: RenderState,
-//   canvas: { width: number; height: number }
-// ): void => {
-//   ctx.beginPath();
-//   ctx.moveTo(joystick.x, joystick.y);
-//   ctx.lineTo(
-//     joystick.x +
-//       joystick.radius *
-//         (state.directions.right ? 1 : state.directions.left ? -1 : 0),
-//     joystick.y +
-//       joystick.radius *
-//         (state.directions.down ? 1 : state.directions.up ? -1 : 0)
-//   );
-//   ctx.strokeStyle = "black";
-//   ctx.lineWidth = 2;
-//   ctx.stroke();
-
-//   const joystickSize = 100;
-//   const innerJoystickSize = 10;
-//   const joystickX = canvas.width - 20 - joystickSize / 2;
-//   const joystickY = canvas.height - 20 - joystickSize / 2;
-
-//   ctx.beginPath();
-//   ctx.arc(joystickX, joystickY, joystickSize / 2, 0, 2 * Math.PI);
-//   ctx.strokeStyle = "black";
-//   ctx.lineWidth = 2;
-//   ctx.stroke();
-
-//   ctx.beginPath();
-//   ctx.arc(joystickX, joystickY, innerJoystickSize / 2, 0, 2 * Math.PI);
-//   ctx.fillStyle = "black";
-//   ctx.fill();
-
-//   ctx.beginPath();
-//   ctx.moveTo(joystickX, joystickY - joystickSize / 2 + innerJoystickSize / 2);
-//   ctx.lineTo(joystickX, joystickY - joystickSize / 2 + innerJoystickSize + 10);
-//   ctx.stroke();
-
-//   ctx.beginPath();
-//   ctx.moveTo(joystickX + joystickSize / 2 - innerJoystickSize / 2, joystickY);
-//   ctx.lineTo(joystickX + joystickSize / 2 - innerJoystickSize - 10, joystickY);
-//   ctx.stroke();
-
-//   ctx.beginPath();
-//   ctx.moveTo(joystickX, joystickY + joystickSize / 2 - innerJoystickSize / 2);
-//   ctx.lineTo(joystickX, joystickY + joystickSize / 2 - innerJoystickSize - 10);
-//   ctx.stroke();
-
-//   ctx.beginPath();
-//   ctx.moveTo(joystickX - joystickSize / 2 + innerJoystickSize / 2, joystickY);
-//   ctx.lineTo(joystickX - joystickSize / 2 + innerJoystickSize + 10, joystickY);
-//   ctx.stroke();
-
-//   ctx.beginPath();
-//   ctx.moveTo(
-//     joystickX - joystickSize / 2 + innerJoystickSize / 2,
-//     joystickY - joystickSize / 2 + innerJoystickSize / 2
-//   );
-//   ctx.lineTo(
-//     joystickX - joystickSize / 2 + innerJoystickSize + 10,
-//     joystickY - joystickSize / 2 + innerJoystickSize + 10
-//   );
-//   ctx.stroke();
-
-//   ctx.beginPath();
-//   ctx.moveTo(
-//     joystickX + joystickSize / 2 - innerJoystickSize / 2,
-//     joystickY - joystickSize / 2 + innerJoystickSize / 2
-//   );
-//   ctx.lineTo(
-//     joystickX + joystickSize / 2 - innerJoystickSize - 10,
-//     joystickY - joystickSize / 2 + innerJoystickSize + 10
-//   );
-//   ctx.stroke();
-
-//   ctx.beginPath();
-//   ctx.moveTo(
-//     joystickX - joystickSize / 2 + innerJoystickSize / 2,
-//     joystickY + joystickSize / 2 - innerJoystickSize / 2
-//   );
-//   ctx.lineTo(
-//     joystickX - joystickSize / 2 + innerJoystickSize + 10,
-//     joystickY + joystickSize / 2 - innerJoystickSize - 10
-//   );
-//   ctx.stroke();
-
-//   ctx.beginPath();
-//   ctx.moveTo(
-//     joystickX + joystickSize / 2 - innerJoystickSize / 2,
-//     joystickY + joystickSize / 2 - innerJoystickSize / 2
-//   );
-//   ctx.lineTo(
-//     joystickX + joystickSize / 2 - innerJoystickSize - 10,
-//     joystickY + joystickSize / 2 - innerJoystickSize - 10
-//   );
-//   ctx.stroke();
-// };
 
 const drawEventNotification = (
   ctx: CanvasRenderingContext2D,
