@@ -100,18 +100,6 @@ const startGame = (
     }
   };
 
-  // const handleTouchStart = (event: TouchEvent) => {
-  //   event.preventDefault();
-  //   state = handleTouchEvents(state)(event);
-
-  //   resetGame();
-  // };
-
-  // const handleTouchMove = (event: TouchEvent) => {
-  //   event.preventDefault();
-  //   state = handleTouchEvents(state)(event);
-  // };
-
   const gameLoop = (currentTime: number) => {
     const deltaTime = currentTime - lastTime;
     lastTime = currentTime;
@@ -137,26 +125,20 @@ const startGame = (
   };
 
   setupEventListeners(
-    // canvas,
     handleMenuNavigation,
     handleMenuValidation,
     handleArrowKeyPress,
     resetGame,
-    // handleTouchStart,
-    // handleTouchMove
   );
 
   requestAnimationFrame(gameLoop);
 };
 
 const setupEventListeners = (
-  // canvas: HTMLCanvasElement,
   handleMenuNavigation: (key: string) => void,
   handleMenuValidation: (key: string) => void,
   handleArrowKeyPress: (key: string, isPressed: boolean) => void,
   resetGame: () => void,
-  // handleTouchStart: (event: TouchEvent) => void,
-  // handleTouchMove: (event: TouchEvent) => void
 ) => {
   window.addEventListener("keydown", (e) => {
     e.preventDefault();
@@ -169,11 +151,7 @@ const setupEventListeners = (
     }
   });
 
-  // if (isToucheDevice()) {
-  //   setupTouchEventListeners(canvas, handleTouchStart, handleTouchMove);
-  // } else {
   setupKeyboardEventListeners(handleArrowKeyPress);
-  // }
 };
 
 const setupKeyboardEventListeners = (
@@ -192,14 +170,6 @@ const setupKeyboardEventListeners = (
     }
   });
 };
-// const setupTouchEventListeners = (
-//   canvas: HTMLCanvasElement,
-//   handleTouchStart: (event: TouchEvent) => void,
-//   handleTouchMove: (event: TouchEvent) => void
-// ) => {
-//   canvas.addEventListener("touchstart", handleTouchStart);
-//   canvas.addEventListener("touchmove", handleTouchMove);
-// };
 
 const renderMenu = (state: RenderState): void => {
   const { canvas, ctx, menu } = state;
@@ -265,10 +235,6 @@ const renderGame = (state: RenderState): void => {
 
   drawEventNotification(ctx, event, canvas);
 
-  // if (isToucheDevice()) {
-  //   drawJoystick(ctx, joystick, state, canvas);
-  // }
-
   if (gameOver || youWin) {
     const buttonWidth = 100;
     const buttonHeight = 40;
@@ -289,51 +255,6 @@ const renderGame = (state: RenderState): void => {
     state.restartButton = null;
   }
 };
-
-// const handleTouchEvents =
-//   (state: GameState) =>
-//   (event: TouchEvent): GameState => {
-//     const { joystick } = state;
-
-//     const { clientX, clientY } = event.touches[0];
-//     const rect =
-//       event.currentTarget instanceof Element
-//         ? event.currentTarget.getBoundingClientRect()
-//         : null;
-
-//     if (rect) {
-//       const touchX = clientX - rect.left;
-//       const touchY = clientY - rect.top;
-
-//       const dx = touchX - joystick.x;
-//       const dy = touchY - joystick.y;
-//       const distance = Math.sqrt(dx ** 2 + dy ** 2);
-
-//       if (distance <= joystick.radius) {
-//         const angle = Math.atan2(dy, dx) * (180 / Math.PI);
-//         const directions: { [key: string]: boolean } = {
-//           right: angle > -67.5 && angle <= 67.5,
-//           down: angle > 22.5 && angle <= 157.5,
-//           left: angle > 112.5 || angle <= -112.5,
-//           up: angle > -157.5 && angle <= -22.5,
-//         };
-
-//         return {
-//           ...state,
-//           directions,
-//         };
-//       }
-//     }
-
-//     return state;
-//   };
-
-// const isToucheDevice = (): boolean => {
-//   return (
-//     !!window.ontouchstart ||
-//     (navigator.maxTouchPoints > 0 && navigator.maxTouchPoints <= 5)
-//   );
-// };
 
 const drawPlayer = (ctx: CanvasRenderingContext2D, player: Player): void => {
   ctx.beginPath();

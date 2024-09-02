@@ -43,7 +43,6 @@ test(`when the game is initialized with a canvas of 100px * 100px,
   };
   expect(createInitialState(1000, 1000, () => 0.32)).toStrictEqual({
     canvas: expectedCanvas,
-    // joystick: expectedJoystick,
     menu: {
       displayed: true,
       selected: "START",

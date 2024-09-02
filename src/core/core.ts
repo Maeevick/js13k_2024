@@ -34,11 +34,6 @@ export type GameState = {
   enemies: Enemy[];
   specialAreas: SpecialArea[];
   directions: { [key: string]: boolean };
-  // joystick: {
-  //   x: number;
-  //   y: number;
-  //   radius: number;
-  // };
   controlsReversed: boolean;
   menu: {
     displayed: boolean;
@@ -114,7 +109,6 @@ export const createInitialState = (
       down: false,
     },
     controlsReversed: false,
-    // joystick: createTouchZone(canvasWidth, canvasHeight),
     menu: {
       displayed: true,
       selected: "START",
@@ -169,18 +163,6 @@ const createSafePosition = (
 
   return { x, y };
 };
-
-// const createTouchZone = (
-//   canvasWidth: number,
-//   canvasHeight: number
-// ): GameState["joystick"] => {
-//   const zoneSize = 100;
-//   return {
-//     x: canvasWidth - zoneSize / 2 - 20,
-//     y: canvasHeight - zoneSize / 2 - 20,
-//     radius: zoneSize / 2,
-//   };
-// };
 
 export const updateGameState = (
   state: GameState,
