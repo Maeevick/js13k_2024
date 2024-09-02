@@ -17,7 +17,6 @@ test(`when the game is initialized with a canvas of 100px * 100px,
     { id: "Jason3", x: 320, y: 320, radius: 5, speed: 60 },
     { id: "Jason4", x: 320, y: 320, radius: 5, speed: 60 },
   ];
-  const expectedGameOverState = false;
   const expectedDirections = {
     up: false,
     down: false,
@@ -31,11 +30,6 @@ test(`when the game is initialized with a canvas of 100px * 100px,
     x: 500,
     y: 500,
   };
-  // const expectedJoystick = {
-  //   x: 930,
-  //   y: 930,
-  //   radius: 50,
-  // };
   const expectedEvent = {
     ROUND_DURATION: 13_000,
     round: 0,
@@ -57,7 +51,8 @@ test(`when the game is initialized with a canvas of 100px * 100px,
     },
     enemies: expectedEnnemies,
     specialAreas: [],
-    gameOver: expectedGameOverState,
+    gameOver: false,
+    youWin: false,
     directions: expectedDirections,
     controlsReversed: false,
     player: expectedPlayer,

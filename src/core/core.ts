@@ -46,6 +46,7 @@ export type GameState = {
     options: MenuOptions[];
   };
   gameOver: boolean;
+  youWin: boolean;
   event: {
     ROUND_DURATION: number;
     round: number;
@@ -120,6 +121,7 @@ export const createInitialState = (
       options: ["START", "HIGH SCORES", "CREDITS"],
     },
     gameOver: false,
+    youWin: false,
     event: {
       ROUND_DURATION: 13_000,
       round: 0,
@@ -309,6 +311,10 @@ const updateEvent = (
 ): GameState => {
   const timer = state.event.timer + deltaTime;
   const round = Math.floor(timer / state.event.ROUND_DURATION);
+
+  if (round > 12) {
+    return { ...state, youWin: true, gameOver: true };
+  }
 
   let updatedState = {
     ...state,
