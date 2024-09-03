@@ -310,6 +310,7 @@ const renderGame = (state: RenderState): void => {
     gameOver,
     youWin,
     event,
+    score,
   } = state;
 
   ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -324,7 +325,7 @@ const renderGame = (state: RenderState): void => {
     drawSpecialArea(ctx, area);
   });
 
-  drawEventNotification(ctx, event, canvas);
+  drawEventNotification(ctx, event, state.score.current, canvas);
 
   if (gameOver || youWin) {
     const buttonWidth = 100;
@@ -339,7 +340,7 @@ const renderGame = (state: RenderState): void => {
       height: buttonHeight,
     };
 
-    drawEndGame(ctx, canvas, restartButton, youWin, event.currentScore);
+    drawEndGame(ctx, canvas, restartButton, youWin, score.current);
 
     state.restartButton = restartButton;
   } else {
@@ -440,8 +441,8 @@ const drawEventNotification = (
     timer: number;
     surprises: Surprise[];
     currentSurprise: Surprise | null;
-    currentScore: number;
   },
+  currentScore: number,
   canvas: { width: number; height: number },
 ): void => {
   ctx.fillStyle = "black";
@@ -449,9 +450,9 @@ const drawEventNotification = (
   ctx.textAlign = "center";
   ctx.textBaseline = "top";
   ctx.fillText(
-    `SCORE: ${event.currentScore} - ROUND: ${
-      event.round + 1
-    } - TIMER: ${Math.floor(event.timer / 1000)}s`,
+    `SCORE: ${currentScore} - ROUND: ${event.round + 1} - TIMER: ${Math.floor(
+      event.timer / 1000,
+    )}s`,
     canvas.width / 2,
     10,
   );

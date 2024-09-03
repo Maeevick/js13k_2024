@@ -50,7 +50,11 @@ export type GameState = {
     timer: number;
     surprises: Surprise[];
     currentSurprise: Surprise | null;
-    currentScore: number;
+  };
+  score: {
+    current: number;
+    enterSpecialArea: boolean;
+    enterDodgeArea: boolean;
   };
 };
 
@@ -150,7 +154,11 @@ export const createInitialState = (
           ],
       ),
       currentSurprise: null,
-      currentScore: 0,
+    },
+    score: {
+      current: 0,
+      enterSpecialArea: false,
+      enterDodgeArea: false,
     },
   };
 };
@@ -209,10 +217,9 @@ const updatePlayerPosition = (
   state: GameState,
   deltaTime: number,
 ): GameState => {
-  const { player, directions, canvas, controlsReversed } = state;
+  const { player, directions, canvas, controlsReversed, score } = state;
 
   let moveDistance = player.speed * (deltaTime / 1000);
-
   const affectingArea = state.specialAreas.find((area) =>
     isColliding(state.player, area),
   );
@@ -220,14 +227,24 @@ const updatePlayerPosition = (
   if (affectingArea) {
     switch (affectingArea.type) {
       case "hole":
-        return { ...state, gameOver: true };
+        return {
+          ...state,
+          gameOver: true,
+        };
       case "slippery":
         moveDistance *= 2;
+        score.enterSpecialArea = true;
         break;
       case "sticky":
         moveDistance *= 0.2;
+        score.enterSpecialArea = true;
         break;
     }
+  }
+
+  if (!affectingArea && score.enterSpecialArea) {
+    score.current += 10;
+    score.enterSpecialArea = false;
   }
 
   const isLeft = controlsReversed ? !directions.left : directions.left;
@@ -251,6 +268,7 @@ const updatePlayerPosition = (
   return {
     ...state,
     player: { ...player, x: newX, y: newY },
+    score: { ...score },
   };
 };
 
@@ -258,7 +276,9 @@ const updateEnemyPositions = (
   state: GameState,
   deltaTime: number,
 ): GameState => {
-  const { player, enemies, canvas } = state;
+  const { player, enemies, canvas, score } = state;
+
+  let bonusScore = 0;
 
   const newEnemies = enemies
     .map((enemy) => {
@@ -275,6 +295,7 @@ const updateEnemyPositions = (
       if (affectingArea) {
         switch (affectingArea.type) {
           case "hole":
+            bonusScore += (100 * enemy.radius) / 5;
             return null;
           case "slippery":
             moveDistance *= 2;
@@ -301,6 +322,10 @@ const updateEnemyPositions = (
   return {
     ...state,
     enemies: newEnemies,
+    score: {
+      ...score,
+      current: score.current + bonusScore,
+    },
   };
 };
 
@@ -312,9 +337,17 @@ const updateEvent = (
 ): GameState => {
   const timer = state.event.timer + deltaTime;
   const round = Math.floor(timer / state.event.ROUND_DURATION);
+  const current =
+    state.score.current +
+    (Math.floor(timer / 1000) - Math.floor(state.event.timer / 1000));
 
   if (round > 12) {
-    return { ...state, youWin: true, gameOver: true };
+    return {
+      ...state,
+      youWin: true,
+      gameOver: true,
+      score: { ...state.score, current: state.score.current + 1000 },
+    };
   }
 
   let updatedState = {
@@ -323,6 +356,10 @@ const updateEvent = (
       ...state.event,
       timer,
       round,
+    },
+    score: {
+      ...state.score,
+      current,
     },
   };
 
@@ -338,17 +375,37 @@ const updateEvent = (
       currentSurprise: state.event.surprises[0],
       surprises: state.event.surprises.slice(1),
     };
+
+    updatedState.score = {
+      ...updatedState.score,
+      current: updatedState.score.current + 100 * (state.event.round + 1),
+    };
   }
 
-  return updatedState;
+  return { ...updatedState };
 };
 
 const checkCollisions = (state: GameState): GameState => {
-  const { player, enemies } = state;
+  const { player, enemies, score } = state;
 
   const collision = enemies.some((enemy) => isColliding(player, enemy));
+  if (collision) {
+    return { ...state, gameOver: true };
+  }
 
-  return collision ? { ...state, gameOver: true } : state;
+  const dodges = enemies.some((enemy) => isDodging(player, enemy));
+  if (dodges && !state.score.enterDodgeArea) {
+    return { ...state, score: { ...score, enterDodgeArea: true } };
+  }
+
+  if (!dodges && state.score.enterDodgeArea) {
+    return {
+      ...state,
+      score: { ...score, enterDodgeArea: false, current: score.current + 100 },
+    };
+  }
+
+  return state;
 };
 
 const checkEnemyCollisions = (
@@ -425,6 +482,17 @@ const isColliding = (
   const distance = Math.sqrt(dx * dx + dy * dy);
 
   return distance < a.radius + b.radius;
+};
+
+const isDodging = (
+  a: { x: number; y: number; radius: number },
+  b: { x: number; y: number; radius: number },
+): boolean => {
+  const dx = a.x - b.x;
+  const dy = a.y - b.y;
+  const distance = Math.sqrt(dx * dx + dy * dy);
+
+  return distance >= a.radius + b.radius && distance < 5;
 };
 
 const handleSurpriseAction = (
@@ -526,6 +594,7 @@ const handleSuperJasonAppears = (
   return {
     ...state,
     enemies: [...state.enemies, superJason],
+    score: { ...state.score, current: state.score.current + 30 },
   };
 };
 
@@ -547,6 +616,7 @@ const handleFourNewJasons = (
   return {
     ...state,
     enemies: [...state.enemies, ...newJasons],
+    score: { ...state.score, current: state.score.current + 40 },
   };
 };
 
@@ -568,6 +638,10 @@ const handleDoubleJasons = (
   return {
     ...state,
     enemies: [...state.enemies, ...newJasons],
+    score: {
+      ...state.score,
+      current: state.score.current + 10 * newJasons.length,
+    },
   };
 };
 

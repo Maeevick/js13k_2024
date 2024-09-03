@@ -44,7 +44,11 @@ test(`when the game is updated and Game Over,
         name: "Controls Reversed",
       })),
       currentSurprise: null,
-      currentScore: 0,
+    },
+    score: {
+      current: 0,
+      enterSpecialArea: false,
+      enterDodgeArea: false,
     },
   };
   expect(
@@ -94,7 +98,11 @@ test(`when the player collides with an ennemy,
         name: "Controls Reversed",
       })),
       currentSurprise: null,
-      currentScore: 0,
+    },
+    score: {
+      current: 0,
+      enterSpecialArea: false,
+      enterDodgeArea: false,
     },
   };
   const expectedGameState = {
@@ -141,7 +149,11 @@ test(`when the player collides with an ennemy,
         name: "Controls Reversed",
       })),
       currentSurprise: null,
-      currentScore: 0,
+    },
+    score: {
+      current: 0,
+      enterSpecialArea: false,
+      enterDodgeArea: false,
     },
   };
   expect(
@@ -191,7 +203,11 @@ test(`when the player moves left for one frame,
         name: "Controls Reversed",
       })),
       currentSurprise: null,
-      currentScore: 0,
+    },
+    score: {
+      current: 0,
+      enterSpecialArea: false,
+      enterDodgeArea: false,
     },
   };
 
@@ -239,7 +255,11 @@ test(`when the player moves left for one frame,
         name: "Controls Reversed",
       })),
       currentSurprise: null,
-      currentScore: 0,
+    },
+    score: {
+      current: 1,
+      enterSpecialArea: false,
+      enterDodgeArea: false,
     },
   };
 
@@ -290,7 +310,11 @@ test(`when the player moves right for one frame,
         name: "Controls Reversed",
       })),
       currentSurprise: null,
-      currentScore: 0,
+    },
+    score: {
+      current: 0,
+      enterSpecialArea: false,
+      enterDodgeArea: false,
     },
   };
 
@@ -338,7 +362,11 @@ test(`when the player moves right for one frame,
         name: "Controls Reversed",
       })),
       currentSurprise: null,
-      currentScore: 0,
+    },
+    score: {
+      current: 1,
+      enterSpecialArea: false,
+      enterDodgeArea: false,
     },
   };
 
@@ -389,7 +417,11 @@ test(`when the player moves up for one frame,
         name: "Controls Reversed",
       })),
       currentSurprise: null,
-      currentScore: 0,
+    },
+    score: {
+      current: 0,
+      enterSpecialArea: false,
+      enterDodgeArea: false,
     },
   };
 
@@ -437,7 +469,11 @@ test(`when the player moves up for one frame,
         name: "Controls Reversed",
       })),
       currentSurprise: null,
-      currentScore: 0,
+    },
+    score: {
+      current: 1,
+      enterSpecialArea: false,
+      enterDodgeArea: false,
     },
   };
 
@@ -488,7 +524,11 @@ test(`when the player moves down for one frame,
         name: "Controls Reversed",
       })),
       currentSurprise: null,
-      currentScore: 0,
+    },
+    score: {
+      current: 0,
+      enterSpecialArea: false,
+      enterDodgeArea: false,
     },
   };
 
@@ -536,7 +576,11 @@ test(`when the player moves down for one frame,
         name: "Controls Reversed",
       })),
       currentSurprise: null,
-      currentScore: 0,
+    },
+    score: {
+      current: 1,
+      enterSpecialArea: false,
+      enterDodgeArea: false,
     },
   };
 
@@ -592,7 +636,11 @@ test(`when the game runs for one frame,
         name: "Controls Reversed",
       })),
       currentSurprise: null,
-      currentScore: 0,
+    },
+    score: {
+      current: 0,
+      enterSpecialArea: false,
+      enterDodgeArea: false,
     },
   };
 
@@ -637,7 +685,11 @@ test(`when the game runs for one frame,
         name: "Controls Reversed",
       })),
       currentSurprise: null,
-      currentScore: 0,
+    },
+    score: {
+      current: 1,
+      enterSpecialArea: false,
+      enterDodgeArea: false,
     },
   };
 
@@ -671,7 +723,7 @@ test(`when the game runs for n round (each 13sec),
       radius: 5,
       speed: 120,
     },
-    enemies: [{ id: "Jason0", x: 0, y: 0, radius: 5, speed: 100 }],
+    enemies: [{ id: "Jason0", x: 100, y: 100, radius: 5, speed: 0 }],
     specialAreas: [],
     directions: {
       up: false,
@@ -700,7 +752,11 @@ test(`when the game runs for n round (each 13sec),
         { id: 13, name: "Only Biggest Jason" },
       ],
       currentSurprise: null,
-      currentScore: 0,
+    },
+    score: {
+      current: 0,
+      enterSpecialArea: false,
+      enterDodgeArea: false,
     },
   };
 
@@ -723,9 +779,14 @@ test(`when the game runs for n round (each 13sec),
       { id: 13, name: "Only Biggest Jason" },
     ],
     currentSurprise: { id: 1, name: "Holes Appear" },
-    currentScore: 0,
   };
-  const expectedEventAfterTwoRound = {
+  const expectedScoreAfterOneRound = {
+    current: 113,
+    enterSpecialArea: false,
+    enterDodgeArea: false,
+  };
+
+  const expectedEventAfterTwoRounds = {
     ROUND_DURATION: 13_000,
     timer: 26_000,
     round: 2,
@@ -743,7 +804,11 @@ test(`when the game runs for n round (each 13sec),
       { id: 13, name: "Only Biggest Jason" },
     ],
     currentSurprise: { id: 2, name: "Jason Speed Up" },
-    currentScore: 0,
+  };
+  const expectedScoreAfterTwoRounds = {
+    current: 326,
+    enterSpecialArea: false,
+    enterDodgeArea: false,
   };
 
   const gameStateAfterTheFirstRound = updateGameState(
@@ -755,6 +820,9 @@ test(`when the game runs for n round (each 13sec),
   expect(gameStateAfterTheFirstRound.event).toStrictEqual(
     expectedEventAfterOneRound,
   );
+  expect(gameStateAfterTheFirstRound.score).toStrictEqual(
+    expectedScoreAfterOneRound,
+  );
 
   const gameStateAfterTheSecondRound = updateGameState(
     gameStateAfterTheFirstRound,
@@ -763,7 +831,10 @@ test(`when the game runs for n round (each 13sec),
     fakeUnique,
   );
   expect(gameStateAfterTheSecondRound.event).toStrictEqual(
-    expectedEventAfterTwoRound,
+    expectedEventAfterTwoRounds,
+  );
+  expect(gameStateAfterTheSecondRound.score).toStrictEqual(
+    expectedScoreAfterTwoRounds,
   );
 });
 
@@ -811,7 +882,11 @@ test(`when the surprise "Jason Speed Up" is fired,
       timer: 0,
       surprises: [{ id: 2, name: "Jason Speed Up" }],
       currentSurprise: null,
-      currentScore: 0,
+    },
+    score: {
+      current: 0,
+      enterSpecialArea: false,
+      enterDodgeArea: false,
     },
   };
 
@@ -866,7 +941,11 @@ test(`when the surprise "Player Speed Up" is fired,
       timer: 0,
       surprises: [{ id: 3, name: "Player Speed Up" }],
       currentSurprise: null,
-      currentScore: 0,
+    },
+    score: {
+      current: 0,
+      enterSpecialArea: false,
+      enterDodgeArea: false,
     },
   };
 
@@ -922,7 +1001,11 @@ test(`when the surprise "Player Speed Up" is fired,
       timer: 0,
       surprises: [{ id: 4, name: "Player Slow Down" }],
       currentSurprise: null,
-      currentScore: 0,
+    },
+    score: {
+      current: 0,
+      enterSpecialArea: false,
+      enterDodgeArea: false,
     },
   };
 
@@ -978,7 +1061,11 @@ test(`when the surprise "Player Speed Up" is fired,
       timer: 0,
       surprises: [{ id: 4, name: "Player Slow Down" }],
       currentSurprise: null,
-      currentScore: 0,
+    },
+    score: {
+      current: 0,
+      enterSpecialArea: false,
+      enterDodgeArea: false,
     },
   };
 
@@ -1039,7 +1126,11 @@ test(`when the surprise "Only Biggest Jason" is fired,
       timer: 0,
       surprises: [{ id: 13, name: "Only Biggest Jason" }],
       currentSurprise: null,
-      currentScore: 0,
+    },
+    score: {
+      current: 0,
+      enterSpecialArea: false,
+      enterDodgeArea: false,
     },
   };
 
@@ -1096,7 +1187,11 @@ test(`when the surprise "Only Biggest Jason" is fired and all the Jasons have th
       timer: 0,
       surprises: [{ id: 13, name: "Only Biggest Jason" }],
       currentSurprise: null,
-      currentScore: 0,
+    },
+    score: {
+      current: 0,
+      enterSpecialArea: false,
+      enterDodgeArea: false,
     },
   };
 
@@ -1151,7 +1246,11 @@ test(`when the surprise "Controls Reversed" is fired,
         { id: 5, name: "Controls Reversed" },
       ],
       currentSurprise: null,
-      currentScore: 0,
+    },
+    score: {
+      current: 0,
+      enterSpecialArea: false,
+      enterDodgeArea: false,
     },
   };
 
@@ -1211,7 +1310,11 @@ test(`when the surprise "Super-Jason Appears" is fired,
       timer: 0,
       surprises: [{ id: 10, name: "Super-Jason Appears" }],
       currentSurprise: null,
-      currentScore: 0,
+    },
+    score: {
+      current: 0,
+      enterSpecialArea: false,
+      enterDodgeArea: false,
     },
   };
 
@@ -1259,7 +1362,11 @@ test(`when the surprise "Holes Appear" is fired,
       timer: 0,
       surprises: [{ id: 1, name: "Holes Appear" }],
       currentSurprise: null,
-      currentScore: 0,
+    },
+    score: {
+      current: 0,
+      enterSpecialArea: false,
+      enterDodgeArea: false,
     },
   };
 
@@ -1312,7 +1419,11 @@ test(`when the surprise "Slippery Floor" is fired,
       timer: 0,
       surprises: [{ id: 6, name: "Slippery Floor" }],
       currentSurprise: null,
-      currentScore: 0,
+    },
+    score: {
+      current: 0,
+      enterSpecialArea: false,
+      enterDodgeArea: false,
     },
   };
 
@@ -1365,7 +1476,11 @@ test(`when the surprise "Sticky Floor" is fired,
       timer: 0,
       surprises: [{ id: 7, name: "Sticky Floor" }],
       currentSurprise: null,
-      currentScore: 0,
+    },
+    score: {
+      current: 0,
+      enterSpecialArea: false,
+      enterDodgeArea: false,
     },
   };
 
@@ -1416,7 +1531,11 @@ test(`when the 13th round ends, then the player wins`, () => {
       timer: 156_000,
       surprises: [],
       currentSurprise: null,
-      currentScore: 0,
+    },
+    score: {
+      current: 0,
+      enterSpecialArea: false,
+      enterDodgeArea: false,
     },
   };
   expect(
