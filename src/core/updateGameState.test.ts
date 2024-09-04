@@ -49,6 +49,7 @@ test(`when the game is updated and Game Over,
       current: 0,
       enterSpecialArea: false,
       enterDodgeArea: false,
+      highScores: [],
     },
   };
   expect(
@@ -103,6 +104,7 @@ test(`when the player collides with an ennemy,
       current: 0,
       enterSpecialArea: false,
       enterDodgeArea: false,
+      highScores: [],
     },
   };
   const expectedGameState = {
@@ -154,6 +156,7 @@ test(`when the player collides with an ennemy,
       current: 0,
       enterSpecialArea: false,
       enterDodgeArea: false,
+      highScores: [],
     },
   };
   expect(
@@ -208,6 +211,7 @@ test(`when the player moves left for one frame,
       current: 0,
       enterSpecialArea: false,
       enterDodgeArea: false,
+      highScores: [],
     },
   };
 
@@ -260,6 +264,7 @@ test(`when the player moves left for one frame,
       current: 1,
       enterSpecialArea: false,
       enterDodgeArea: false,
+      highScores: [],
     },
   };
 
@@ -315,6 +320,7 @@ test(`when the player moves right for one frame,
       current: 0,
       enterSpecialArea: false,
       enterDodgeArea: false,
+      highScores: [],
     },
   };
 
@@ -367,6 +373,7 @@ test(`when the player moves right for one frame,
       current: 1,
       enterSpecialArea: false,
       enterDodgeArea: false,
+      highScores: [],
     },
   };
 
@@ -422,6 +429,7 @@ test(`when the player moves up for one frame,
       current: 0,
       enterSpecialArea: false,
       enterDodgeArea: false,
+      highScores: [],
     },
   };
 
@@ -474,6 +482,7 @@ test(`when the player moves up for one frame,
       current: 1,
       enterSpecialArea: false,
       enterDodgeArea: false,
+      highScores: [],
     },
   };
 
@@ -529,6 +538,7 @@ test(`when the player moves down for one frame,
       current: 0,
       enterSpecialArea: false,
       enterDodgeArea: false,
+      highScores: [],
     },
   };
 
@@ -581,6 +591,7 @@ test(`when the player moves down for one frame,
       current: 1,
       enterSpecialArea: false,
       enterDodgeArea: false,
+      highScores: [],
     },
   };
 
@@ -641,6 +652,7 @@ test(`when the game runs for one frame,
       current: 0,
       enterSpecialArea: false,
       enterDodgeArea: false,
+      highScores: [],
     },
   };
 
@@ -690,6 +702,7 @@ test(`when the game runs for one frame,
       current: 1,
       enterSpecialArea: false,
       enterDodgeArea: false,
+      highScores: [],
     },
   };
 
@@ -757,6 +770,7 @@ test(`when the game runs for n round (each 13sec),
       current: 0,
       enterSpecialArea: false,
       enterDodgeArea: false,
+      highScores: [],
     },
   };
 
@@ -784,6 +798,7 @@ test(`when the game runs for n round (each 13sec),
     current: 113,
     enterSpecialArea: false,
     enterDodgeArea: false,
+    highScores: [],
   };
 
   const expectedEventAfterTwoRounds = {
@@ -809,6 +824,7 @@ test(`when the game runs for n round (each 13sec),
     current: 326,
     enterSpecialArea: false,
     enterDodgeArea: false,
+    highScores: [],
   };
 
   const gameStateAfterTheFirstRound = updateGameState(
@@ -887,6 +903,7 @@ test(`when the surprise "Jason Speed Up" is fired,
       current: 0,
       enterSpecialArea: false,
       enterDodgeArea: false,
+      highScores: [],
     },
   };
 
@@ -946,6 +963,7 @@ test(`when the surprise "Player Speed Up" is fired,
       current: 0,
       enterSpecialArea: false,
       enterDodgeArea: false,
+      highScores: [],
     },
   };
 
@@ -1006,6 +1024,7 @@ test(`when the surprise "Player Speed Up" is fired,
       current: 0,
       enterSpecialArea: false,
       enterDodgeArea: false,
+      highScores: [],
     },
   };
 
@@ -1066,6 +1085,7 @@ test(`when the surprise "Player Speed Up" is fired,
       current: 0,
       enterSpecialArea: false,
       enterDodgeArea: false,
+      highScores: [],
     },
   };
 
@@ -1131,6 +1151,7 @@ test(`when the surprise "Only Biggest Jason" is fired,
       current: 0,
       enterSpecialArea: false,
       enterDodgeArea: false,
+      highScores: [],
     },
   };
 
@@ -1192,6 +1213,7 @@ test(`when the surprise "Only Biggest Jason" is fired and all the Jasons have th
       current: 0,
       enterSpecialArea: false,
       enterDodgeArea: false,
+      highScores: [],
     },
   };
 
@@ -1251,6 +1273,7 @@ test(`when the surprise "Controls Reversed" is fired,
       current: 0,
       enterSpecialArea: false,
       enterDodgeArea: false,
+      highScores: [],
     },
   };
 
@@ -1315,6 +1338,7 @@ test(`when the surprise "Super-Jason Appears" is fired,
       current: 0,
       enterSpecialArea: false,
       enterDodgeArea: false,
+      highScores: [],
     },
   };
 
@@ -1367,6 +1391,7 @@ test(`when the surprise "Holes Appear" is fired,
       current: 0,
       enterSpecialArea: false,
       enterDodgeArea: false,
+      highScores: [],
     },
   };
 
@@ -1424,6 +1449,7 @@ test(`when the surprise "Slippery Floor" is fired,
       current: 0,
       enterSpecialArea: false,
       enterDodgeArea: false,
+      highScores: [],
     },
   };
 
@@ -1481,6 +1507,7 @@ test(`when the surprise "Sticky Floor" is fired,
       current: 0,
       enterSpecialArea: false,
       enterDodgeArea: false,
+      highScores: [],
     },
   };
 
@@ -1536,6 +1563,7 @@ test(`when the 13th round ends, then the player wins`, () => {
       current: 0,
       enterSpecialArea: false,
       enterDodgeArea: false,
+      highScores: [],
     },
   };
   expect(

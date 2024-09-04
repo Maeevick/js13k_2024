@@ -44,8 +44,9 @@ test(`when the game is initialized with a canvas of 100px * 100px,
     current: 0,
     enterSpecialArea: false,
     enterDodgeArea: false,
+    highScores: [],
   };
-  expect(createInitialState(1000, 1000, () => 0.32)).toStrictEqual({
+  expect(createInitialState(1000, 1000, [], () => 0.32)).toStrictEqual({
     canvas: expectedCanvas,
     menu: {
       main: true,
@@ -101,16 +102,16 @@ test(`when the game is initialized
     { id: "Jason4", x: 100, y: 100, radius: 5, speed: 60 },
   ];
 
-  expect(createInitialState(1000, 1000, () => 0.49).enemies).toStrictEqual(
+  expect(createInitialState(1000, 1000, [], () => 0.49).enemies).toStrictEqual(
     expectedEnnemiesPushedToTopLeft,
   );
-  expect(createInitialState(1000, 1000, () => 0.51).enemies).toStrictEqual(
+  expect(createInitialState(1000, 1000, [], () => 0.51).enemies).toStrictEqual(
     expectedEnnemiesPushedToBottomRight,
   );
-  expect(createInitialState(100, 100, () => 0.49).enemies).toStrictEqual(
+  expect(createInitialState(100, 100, [], () => 0.49).enemies).toStrictEqual(
     expectedEnnemiesPushedToTheEdgeTopLeft,
   );
-  expect(createInitialState(100, 100, () => 0.51).enemies).toStrictEqual(
+  expect(createInitialState(100, 100, [], () => 0.51).enemies).toStrictEqual(
     expectedEnnemiesPushedToTheEdgeBottomRight,
   );
 });
@@ -119,95 +120,95 @@ test(`when the game is initialized
   then
     the event's surprises are setup`, () => {
   expect(
-    createInitialState(100, 100, () => 0).event.surprises.length,
+    createInitialState(100, 100, [], () => 0).event.surprises.length,
   ).toStrictEqual(13);
 
   expect(
-    createInitialState(100, 100, () => 0 / 13).event.surprises[0],
+    createInitialState(100, 100, [], () => 0 / 13).event.surprises[0],
   ).toStrictEqual({
     id: 1,
     name: "Holes Appear",
   });
 
   expect(
-    createInitialState(100, 100, () => 1 / 13).event.surprises[0],
+    createInitialState(100, 100, [], () => 1 / 13).event.surprises[0],
   ).toStrictEqual({
     id: 2,
     name: "Jason Speed Up",
   });
 
   expect(
-    createInitialState(100, 100, () => 2 / 13).event.surprises[0],
+    createInitialState(100, 100, [], () => 2 / 13).event.surprises[0],
   ).toStrictEqual({
     id: 3,
     name: "Player Speed Up",
   });
 
   expect(
-    createInitialState(100, 100, () => 3 / 13).event.surprises[0],
+    createInitialState(100, 100, [], () => 3 / 13).event.surprises[0],
   ).toStrictEqual({
     id: 4,
     name: "Player Slow Down",
   });
 
   expect(
-    createInitialState(100, 100, () => 4 / 13).event.surprises[0],
+    createInitialState(100, 100, [], () => 4 / 13).event.surprises[0],
   ).toStrictEqual({
     id: 5,
     name: "Controls Reversed",
   });
 
   expect(
-    createInitialState(100, 100, () => 5 / 13).event.surprises[0],
+    createInitialState(100, 100, [], () => 5 / 13).event.surprises[0],
   ).toStrictEqual({
     id: 6,
     name: "Slippery Floor",
   });
 
   expect(
-    createInitialState(100, 100, () => 6 / 13).event.surprises[0],
+    createInitialState(100, 100, [], () => 6 / 13).event.surprises[0],
   ).toStrictEqual({
     id: 7,
     name: "Sticky Floor",
   });
 
   expect(
-    createInitialState(100, 100, () => 7 / 13).event.surprises[0],
+    createInitialState(100, 100, [], () => 7 / 13).event.surprises[0],
   ).toStrictEqual({
     id: 8,
     name: "Arena Shape Change",
   });
 
   expect(
-    createInitialState(100, 100, () => 8 / 13).event.surprises[0],
+    createInitialState(100, 100, [], () => 8 / 13).event.surprises[0],
   ).toStrictEqual({
     id: 9,
     name: "Jasons to Edges",
   });
 
   expect(
-    createInitialState(100, 100, () => 9 / 13).event.surprises[0],
+    createInitialState(100, 100, [], () => 9 / 13).event.surprises[0],
   ).toStrictEqual({
     id: 10,
     name: "Super-Jason Appears",
   });
 
   expect(
-    createInitialState(100, 100, () => 10 / 13).event.surprises[0],
+    createInitialState(100, 100, [], () => 10 / 13).event.surprises[0],
   ).toStrictEqual({
     id: 11,
     name: "4 New Jasons",
   });
 
   expect(
-    createInitialState(100, 100, () => 11 / 13).event.surprises[0],
+    createInitialState(100, 100, [], () => 11 / 13).event.surprises[0],
   ).toStrictEqual({
     id: 12,
     name: "Double Jasons",
   });
 
   expect(
-    createInitialState(100, 100, () => 12 / 13).event.surprises[0],
+    createInitialState(100, 100, [], () => 12 / 13).event.surprises[0],
   ).toStrictEqual({
     id: 13,
     name: "Only Biggest Jason",

@@ -55,10 +55,24 @@ export type GameState = {
     current: number;
     enterSpecialArea: boolean;
     enterDodgeArea: boolean;
+    highScores: string[];
   };
 };
 
 type Position = { x: number; y: number };
+
+export const INITIAL_HIGH_SCORES: string[] = [
+  "AAA: 13.000",
+  "BBB: 12.999",
+  "CCC: 9.999",
+  "DDD: 7.777",
+  "EEE: 6.666",
+  "FFF: 5.555",
+  "GGG: 4.444",
+  "HHH: 42",
+  "III: 4",
+  "JJJ: 1",
+];
 
 const SURPRISES: Surprise[] = [
   { id: 1, name: "Holes Appear" },
@@ -93,6 +107,7 @@ export const CREDITS: string[] = [
 export const createInitialState = (
   canvasWidth: number,
   canvasHeight: number,
+  highScores: string[],
   random: () => number,
   showMainMenu = true,
 ): GameState => {
@@ -159,6 +174,7 @@ export const createInitialState = (
       current: 0,
       enterSpecialArea: false,
       enterDodgeArea: false,
+      highScores,
     },
   };
 };

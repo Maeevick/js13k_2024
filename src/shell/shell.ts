@@ -7,7 +7,12 @@ import type {
   GameState,
 } from "../core/core.ts";
 
-import { CREDITS, createInitialState, updateGameState } from "../core/core.ts";
+import {
+  CREDITS,
+  INITIAL_HIGH_SCORES,
+  createInitialState,
+  updateGameState,
+} from "../core/core.ts";
 
 type RenderState = GameState & {
   ctx: CanvasRenderingContext2D;
@@ -35,7 +40,13 @@ const startGame = (
   canvas: HTMLCanvasElement,
   ctx: CanvasRenderingContext2D,
 ) => {
-  let state = createInitialState(canvas.width, canvas.height, Math.random);
+  const storedHighScores = retrieveStoredHighScores();
+  let state = createInitialState(
+    canvas.width,
+    canvas.height,
+    storedHighScores,
+    Math.random,
+  );
 
   let lastTime = performance.now();
 
@@ -90,6 +101,7 @@ const startGame = (
         state.menu.credits = false;
         state.gameOver = false;
       } else if (state.menu.main && state.menu.selected === "HIGH SCORES") {
+        state.score.highScores = retrieveStoredHighScores();
         state.menu.main = false;
         state.menu.scores = true;
         state.menu.credits = false;
@@ -131,9 +143,11 @@ const startGame = (
 
   const resetGame = () => {
     if (state.gameOver) {
+      const storedHighScores = retrieveStoredHighScores();
       state = createInitialState(
         canvas.width,
         canvas.height,
+        storedHighScores,
         Math.random,
         false,
       );
@@ -147,6 +161,14 @@ const startGame = (
   );
 
   requestAnimationFrame(gameLoop);
+};
+
+const retrieveStoredHighScores = () => {
+  const storedHighScores = localStorage.getItem("storedHighScores");
+  if (storedHighScores) {
+    return JSON.parse(storedHighScores!);
+  }
+  return INITIAL_HIGH_SCORES;
 };
 
 const setupEventListeners = (
@@ -220,7 +242,7 @@ const renderMenu = (state: RenderState): void => {
 };
 
 const renderHighScores = (state: RenderState): void => {
-  const { canvas, ctx } = state;
+  const { canvas, ctx, score } = state;
 
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 
@@ -237,18 +259,7 @@ const renderHighScores = (state: RenderState): void => {
 
   ctx.font = "bold 20px Courier New";
 
-  [
-    "AAA: 13.000",
-    "BBB: 12.999",
-    "CCC: 9.999",
-    "DDD: 7.777",
-    "EEE: 6.666",
-    "FFF: 5.555",
-    "GGG: 4.444",
-    "HHH: 42",
-    "III: 4",
-    "JJJ: 1",
-  ].forEach((cred, i) => {
+  score.highScores.forEach((cred, i) => {
     ctx.fillStyle = i % 2 ? "yellow" : "green";
     ctx.fillText(cred, canvas.width / 2, 60 + i * 20);
   });
