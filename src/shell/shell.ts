@@ -336,7 +336,7 @@ const renderGame = (state: RenderState): void => {
     drawSpecialArea(ctx, area);
   });
 
-  drawEventNotification(ctx, event, state.score.current, canvas);
+  drawEventNotification(ctx, gameOver, event, score, canvas);
 
   if (gameOver || youWin) {
     const buttonWidth = 100;
@@ -446,6 +446,7 @@ const drawEndGame = (
 
 const drawEventNotification = (
   ctx: CanvasRenderingContext2D,
+  gameOver: boolean,
   event: {
     ROUND_DURATION: number;
     round: number;
@@ -453,7 +454,12 @@ const drawEventNotification = (
     surprises: Surprise[];
     currentSurprise: Surprise | null;
   },
-  currentScore: number,
+  score: {
+    current: number;
+    enterSpecialArea: boolean;
+    enterDodgeArea: boolean;
+    highScores: string[];
+  },
   canvas: { width: number; height: number },
 ): void => {
   ctx.fillStyle = "black";
@@ -461,7 +467,7 @@ const drawEventNotification = (
   ctx.textAlign = "center";
   ctx.textBaseline = "top";
   ctx.fillText(
-    `SCORE: ${currentScore} - ROUND: ${event.round + 1} - TIMER: ${Math.floor(
+    `SCORE: ${score.current} - ROUND: ${event.round + 1} - TIMER: ${Math.floor(
       event.timer / 1000,
     )}s`,
     canvas.width / 2,
@@ -476,5 +482,11 @@ const drawEventNotification = (
       canvas.width / 2,
       40,
     );
+  }
+
+  if (score.enterDodgeArea && !gameOver) {
+    ctx.fillStyle = "green";
+    ctx.font = "bold 12px Courier New";
+    ctx.fillText("DODGE!", canvas.width / 2, 40);
   }
 };
