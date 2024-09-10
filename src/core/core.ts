@@ -495,9 +495,8 @@ const isColliding = (
 ): boolean => {
   const dx = a.x - b.x;
   const dy = a.y - b.y;
-  const distance = Math.sqrt(dx * dx + dy * dy);
 
-  return distance < a.radius + b.radius;
+  return Math.sqrt(dx * dx + dy * dy) - (a.radius + b.radius) < 0;
 };
 
 const isDodging = (
@@ -506,9 +505,10 @@ const isDodging = (
 ): boolean => {
   const dx = a.x - b.x;
   const dy = a.y - b.y;
-  const distance = Math.sqrt(dx * dx + dy * dy);
 
-  return distance >= a.radius + b.radius && distance < 5;
+  const distance = Math.sqrt(dx * dx + dy * dy) - (a.radius + b.radius);
+
+  return distance > 0 && distance <= 10;
 };
 
 const handleSurpriseAction = (
