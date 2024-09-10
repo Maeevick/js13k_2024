@@ -367,19 +367,13 @@ const drawPlayer = (ctx: CanvasRenderingContext2D, player: Player): void => {
 };
 
 const drawEnemy = (ctx: CanvasRenderingContext2D, enemy: Enemy): void => {
-  ctx.strokeStyle = "black";
-  ctx.lineWidth = 1;
-  ctx.strokeRect(
+  ctx.drawImage(
+    getJasonImage(),
     enemy.x - enemy.radius,
     enemy.y - enemy.radius,
     enemy.radius * 2,
     enemy.radius * 2,
   );
-  ctx.fillStyle = "red";
-  ctx.font = "bold 6px Courier New";
-  ctx.textAlign = "center";
-  ctx.textBaseline = "middle";
-  ctx.fillText("13", enemy.x, enemy.y);
 };
 
 const drawSpecialArea = (
@@ -489,4 +483,13 @@ const drawEventNotification = (
     ctx.font = "bold 12px Courier New";
     ctx.fillText("DODGE!", canvas.width / 2, 40);
   }
+};
+
+const getJasonImage = () => {
+  const jason = new Image();
+
+  const el = document.getElementById("jason") as HTMLImageElement;
+  jason.src = el.src;
+
+  return jason;
 };
