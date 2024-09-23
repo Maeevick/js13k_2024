@@ -16,7 +16,7 @@
     "ci:fix": "npm run format:fix && npm run lint && npm run test:nowatch && npm run build"
   },
   "devDependencies": {
-    "@eslint/js": "^9.9.1",
+    "@eslint/js": "^9.11.0",
     "eslint": "^9.9.1",
     "globals": "^15.9.0",
     "lightningcss": "^1.26.0",
