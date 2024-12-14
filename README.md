@@ -2,5 +2,4 @@
 a MicroGame Maker journey
 
 Related Newsletters to follow the journey: 
-- [MicroGame Maker - EN 🇬🇧](https://maeevick.substack.com/s/microgame-maker-en-edition)
-- [MicroGame Maker - FR 🇫🇷](https://maeevick.substack.com/s/microgame-maker)
+- [JS13K 2034 - daily blog - FR 🇫🇷 / EN 🇬🇧](https://maeevick.substack.com/t/js13k2024)
